@@ -1,0 +1,2493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Relatórios · Portal do Educador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Paleta institucional */
+  --ink:       #0c1825;
+  --ink-2:     #1e3249;
+  --ink-3:     #2c4a6e;
+  --cobalt:    #1a3f7a;
+  --cobalt-mid:#2356a8;
+  --cobalt-lt: #3b74cc;
+  --sky:       #e8f2ff;
+  --sky-deep:  #d0e4ff;
+  --slate:     #eef1f6;
+  --border:    #d8dfe9;
+  --border-lt: #eaeff5;
+  --bg:        #f2f4f8;
+  --canvas:    #ffffff;
+  --text:      #111827;
+  --t2:        #374151;
+  --t3:        #6b7280;
+  --t4:        #9ca3af;
+  --t5:        #d1d5db;
+  /* Status */
+  --green:     #166534;
+  --green-bg:  #f0fdf4;
+  --green-b:   #bbf7d0;
+  --amber:     #92400e;
+  --amber-bg:  #fffbeb;
+  --red:       #991b1b;
+  --red-bg:    #fff1f2;
+  /* Tipo */
+  --f-body:    'DM Sans', system-ui, sans-serif;
+  --f-display: 'DM Serif Display', Georgia, serif;
+  --f-mono:    'Fira Code', monospace;
+  /* Raio */
+  --r3:3px; --r5:5px; --r8:8px; --r12:12px; --r16:16px;
+  /* Sombras */
+  --sh-xs: 0 1px 2px rgba(0,0,0,.05);
+  --sh-sm: 0 1px 4px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.04);
+  --sh-md: 0 4px 16px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.04);
+  --sh-lg: 0 12px 40px rgba(0,0,0,.10),0 4px 12px rgba(0,0,0,.06);
+  --sh-xl: 0 20px 60px rgba(0,0,0,.15),0 8px 24px rgba(0,0,0,.08);
+}
+
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--f-body);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* ═══════════════════════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════════════════════ */
+.topbar{
+  position:sticky;top:0;z-index:300;
+  background:var(--ink);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  box-shadow:0 4px 24px rgba(0,0,0,.3);
+}
+.topbar-inner{
+  max-width:1360px;margin:0 auto;padding:0 32px;
+  height:58px;display:flex;align-items:center;gap:20px;
+}
+.tbar-logo-slot{
+  position:relative;width:120px;height:44px;
+  border-radius:var(--r8);
+  background:rgba(255,255,255,.07);
+  border:1.5px dashed rgba(255,255,255,.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;overflow:hidden;flex-shrink:0;
+  transition:background .2s,border-color .2s;
+  padding:4px 8px;
+}
+.tbar-logo-slot:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4)}
+.tbar-logo-slot img{width:100%;height:100%;object-fit:contain;display:none;border-radius:4px}
+.tbar-logo-slot span{font-size:8px;color:rgba(255,255,255,.38);text-align:center;line-height:1.3;padding:2px;letter-spacing:.3px}
+#logoFileInput{display:none}
+.tbar-brand{flex:1;min-width:0}
+.tbar-brand h1{
+  font-family:var(--f-display);font-size:17px;font-weight:400;
+  letter-spacing:-.2px;line-height:1.2;
+  color:#ffffff;
+  display:flex;align-items:center;gap:8px;
+}
+.tbar-brand h1 .sep{color:rgba(255,255,255,.2);font-weight:300}
+.tbar-brand h1 .sub{font-family:var(--f-body);font-size:12px;font-weight:400;color:rgba(255,255,255,.4)}
+.tbar-meta{
+  display:flex;align-items:center;gap:8px;
+}
+.tbar-badge{
+  padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:600;letter-spacing:.3px;
+  background:rgba(58,116,204,.35);
+  border:1px solid rgba(58,116,204,.5);
+  color:#93c5fd;
+}
+.tbar-autosave{
+  display:flex;align-items:center;gap:5px;
+  font-size:11px;color:rgba(255,255,255,.35);
+}
+.tbar-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#4ade80;
+  box-shadow:0 0 0 2px rgba(74,222,128,.25);
+  animation:pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+
+/* ═══════════════════════════════════════════════════════
+   BARRA DE TABS
+═══════════════════════════════════════════════════════ */
+.tabbar{
+  background:linear-gradient(180deg, #152d4a 0%, #1c3a5e 100%);
+  border-bottom:2px solid rgba(255,255,255,.06);
+  box-shadow:0 6px 24px rgba(0,0,0,.2);
+}
+.tabbar-inner{
+  max-width:1360px;margin:0 auto;padding:16px 32px 0;
+}
+.tabbar-label{
+  font-size:9px;font-weight:600;letter-spacing:2.5px;
+  text-transform:uppercase;color:rgba(255,255,255,.22);
+  margin-bottom:12px;
+}
+.tab-rail{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:4px;
+}
+.tab-item{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:10px 4px 8px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  border-bottom:none;
+  border-radius:6px 6px 0 0;
+  cursor:pointer;
+  transition:all .15s;
+  user-select:none;
+}
+.tab-item:hover{
+  background:rgba(255,255,255,.1);
+  border-color:rgba(255,255,255,.15);
+  transform:translateY(-1px);
+}
+.tab-item.on{
+  background:var(--bg);
+  border-color:var(--border);
+  transform:translateY(0);
+  box-shadow:0 -3px 12px rgba(0,0,0,.18);
+}
+.tab-code{
+  font-family:var(--f-mono);font-size:11px;font-weight:500;
+  color:rgba(255,255,255,.4);line-height:1;letter-spacing:.5px;
+}
+.tab-item:hover .tab-code{color:rgba(255,255,255,.8)}
+.tab-item.on .tab-code{color:var(--cobalt-mid)}
+.tab-name{
+  font-size:8.5px;font-weight:500;line-height:1.25;
+  text-align:center;color:rgba(255,255,255,.35);
+  max-width:70px;word-break:break-word;hyphens:auto;
+}
+.tab-item:hover .tab-name{color:rgba(255,255,255,.8)}
+.tab-item.on .tab-name{color:var(--t2);font-weight:600}
+
+@media(max-width:1200px){.tab-rail{grid-template-columns:repeat(8,1fr)}}
+@media(max-width:600px){.tab-rail{grid-template-columns:repeat(4,1fr)}.tabbar-inner{padding:12px 16px 0}}
+
+/* ═══════════════════════════════════════════════════════
+   WORKSPACE
+═══════════════════════════════════════════════════════ */
+.workspace{
+  max-width:1360px;margin:0 auto;
+  padding:28px 32px 48px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:24px;
+  align-items:start;
+  transition:grid-template-columns .25s;
+}
+.workspace.show-preview{
+  grid-template-columns:1fr 420px;
+}
+@media(max-width:1150px){.workspace{grid-template-columns:1fr}}
+@media(max-width:680px){.workspace{padding:18px 14px 32px}}
+
+/* ═══════════════════════════════════════════════════════
+   PAINEL ESQUERDO — FORMULÁRIO
+═══════════════════════════════════════════════════════ */
+.form-panel{
+  background:var(--canvas);
+  border-radius:var(--r16);
+  border:1px solid var(--border);
+  box-shadow:var(--sh-md);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+
+/* Cabeçalho do formulário */
+.form-head{
+  padding:24px 28px 20px;
+  background:linear-gradient(135deg,var(--ink-2) 0%,var(--cobalt) 100%);
+  display:flex;align-items:flex-start;gap:16px;
+  position:relative;overflow:hidden;
+}
+.form-head::before{
+  content:'';position:absolute;
+  top:-30px;right:-30px;
+  width:140px;height:140px;
+  border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.form-head-icon{
+  width:52px;height:52px;flex-shrink:0;
+  background:rgba(255,255,255,.12);
+  border:1.5px solid rgba(255,255,255,.18);
+  border-radius:var(--r12);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:12px;font-weight:500;
+  color:rgba(255,255,255,.9);
+  backdrop-filter:blur(8px);
+}
+.form-head-text{flex:1;min-width:0}
+.form-head-text h2{
+  font-family:var(--f-display);
+  font-size:21px;font-weight:400;
+  color:#ffffff;margin-bottom:5px;line-height:1.2;
+  letter-spacing:-.3px;
+}
+.form-head-text p{font-size:12px;color:rgba(255,255,255,.55);line-height:1.5}
+
+/* Corpo do formulário */
+.form-body{
+  padding:0 28px;
+  flex:1;overflow:visible;
+}
+.form-body > *:first-child{margin-top:24px}
+
+/* Seção */
+.fsec{margin-bottom:28px}
+.fsec-head{
+  display:grid;grid-template-columns:auto 1fr auto;
+  align-items:center;gap:10px;
+  margin-bottom:16px;
+  padding-bottom:10px;
+  border-bottom:1.5px solid var(--border-lt);
+}
+.fsec-num{
+  font-family:var(--f-mono);font-size:9.5px;font-weight:500;
+  color:var(--cobalt-mid);
+  background:var(--sky);
+  border:1px solid var(--sky-deep);
+  padding:2px 7px;border-radius:var(--r3);
+  letter-spacing:.5px;
+}
+.fsec-title{
+  font-size:10px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--ink-3);
+}
+.fsec-count{
+  font-family:var(--f-mono);font-size:9px;
+  color:var(--t4);letter-spacing:.3px;
+}
+
+/* Grade de campos */
+.fg{display:grid;gap:14px}
+.fg-2{grid-template-columns:1fr 1fr}
+.fg-3{grid-template-columns:1fr 1fr 1fr}
+.fg-13{grid-template-columns:1fr 3fr}
+.fg-23{grid-template-columns:2fr 1fr}
+.s2{grid-column:span 2}
+.s3{grid-column:span 3}
+@media(max-width:860px){.fg-3,.fg-2{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.fg-3,.fg-2,.fg-13,.fg-23{grid-template-columns:1fr}.s2,.s3{grid-column:span 1}}
+
+/* Campos */
+.field{display:flex;flex-direction:column;gap:5px;position:relative}
+.field label{
+  font-size:11px;font-weight:600;
+  color:var(--t2);letter-spacing:.2px;
+  display:flex;align-items:center;gap:5px;
+}
+.field label .tip{
+  font-size:10px;font-weight:400;color:var(--t4);
+  font-family:var(--f-body);letter-spacing:0;
+}
+.field label .req{color:var(--cobalt-mid);font-size:12px;line-height:1}
+
+input[type=text],input[type=date],input[type=email],
+input[type=tel],input[type=number],select,textarea{
+  font-family:var(--f-body);font-size:13.5px;
+  color:var(--text);background:var(--canvas);
+  border:1.5px solid var(--border);
+  border-radius:var(--r8);
+  padding:9px 13px;width:100%;
+  transition:border-color .14s,box-shadow .14s,background .14s;
+  line-height:1.5;
+}
+input:hover,select:hover,textarea:hover{border-color:var(--border-lt);border-color:#b8c4d4}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--cobalt-mid);
+  box-shadow:0 0 0 3px rgba(35,86,168,.1);
+  background:#fcfdff;
+}
+input::placeholder,textarea::placeholder{color:var(--t5);font-size:13px}
+input[type=date]{cursor:pointer}
+input[readonly]{background:var(--slate);color:var(--t3);cursor:default;border-style:dashed}
+select{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  padding-right:32px;cursor:pointer;
+}
+textarea{resize:vertical;min-height:84px;line-height:1.65}
+textarea.sm{min-height:68px}
+textarea.md{min-height:108px}
+textarea.lg{min-height:140px}
+textarea.xl{min-height:178px}
+
+/* Tabela dinâmica */
+.dyn-wrap{overflow-x:auto;border-radius:var(--r8);border:1.5px solid var(--border)}
+.dyn-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+.dyn-table thead th{
+  background:var(--ink-2);color:rgba(255,255,255,.9);
+  padding:9px 11px;text-align:left;
+  font-size:10.5px;font-weight:600;letter-spacing:.5px;
+}
+.dyn-table thead th:first-child{border-radius:0}
+.dyn-table tbody td{border-bottom:1px solid var(--border-lt);padding:0}
+.dyn-table tbody tr:last-child td{border-bottom:none}
+.dyn-table tbody td input{
+  border:none;border-radius:0;padding:8px 11px;
+  font-size:12.5px;font-family:var(--f-body);
+  width:100%;background:transparent;
+}
+.dyn-table tbody td input:focus{
+  background:var(--sky);
+  box-shadow:inset 0 0 0 2px var(--cobalt-mid);
+  outline:none;
+}
+.dyn-table tbody tr:nth-child(even){background:#fafbfd}
+.dyn-table tbody tr:hover{background:var(--sky)}
+.btn-addrow{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:10px;padding:6px 14px;
+  background:var(--green-bg);color:var(--green);
+  border:1.5px solid var(--green-b);
+  border-radius:var(--r5);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .14s;
+  font-family:var(--f-body);
+}
+.btn-addrow:hover{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* Upload imagens */
+.img-drop{
+  border:2px dashed var(--border);
+  border-radius:var(--r12);padding:20px;
+  text-align:center;cursor:pointer;
+  background:var(--slate);
+  transition:all .15s;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.img-drop:hover{border-color:var(--cobalt-mid);background:var(--sky)}
+.img-drop-icon{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--sky-deep);
+  display:flex;align-items:center;justify-content:center;
+}
+.img-drop p{font-size:13px;font-weight:500;color:var(--t2)}
+.img-drop small{font-size:11px;color:var(--t4)}
+#imgFileInput{display:none}
+.img-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.img-thumb{
+  position:relative;width:90px;height:72px;
+  border-radius:var(--r8);overflow:hidden;
+  border:1.5px solid var(--border);
+  box-shadow:var(--sh-xs);
+  flex-shrink:0;
+}
+.img-thumb img{width:100%;height:100%;object-fit:cover}
+.img-thumb-del{
+  position:absolute;top:4px;right:4px;
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(15,24,37,.75);color:#fff;
+  border:none;cursor:pointer;font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .14s;backdrop-filter:blur(4px);
+}
+.img-thumb-del:hover{background:var(--red)}
+
+/* ═══════════════════════════════════════════════════════
+   BARRA DE AÇÕES
+═══════════════════════════════════════════════════════ */
+.form-actions{
+  padding:16px 28px;
+  margin-top:8px;
+  background:var(--slate);
+  border-top:1.5px solid var(--border-lt);
+  display:flex;align-items:center;gap:10px;
+  flex-wrap:wrap;
+  border-radius:0 0 var(--r16) var(--r16);
+}
+.act-primary{display:flex;gap:8px}
+.act-secondary{display:flex;gap:6px;margin-left:auto}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 18px;border-radius:var(--r8);
+  font-family:var(--f-body);font-size:13px;font-weight:600;
+  cursor:pointer;border:none;transition:all .15s;
+  letter-spacing:.1px;white-space:nowrap;line-height:1.4;
+}
+.btn svg{flex-shrink:0;opacity:.9}
+.btn-primary{
+  background:linear-gradient(135deg,var(--cobalt) 0%,var(--cobalt-mid) 100%);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(26,63,122,.3),0 1px 2px rgba(26,63,122,.2);
+}
+.btn-primary:hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 20px rgba(26,63,122,.35),0 2px 6px rgba(26,63,122,.2);
+}
+.btn-primary:active{transform:translateY(0)}
+.btn-outline{
+  background:var(--canvas);color:var(--t2);
+  border:1.5px solid var(--border);
+  box-shadow:var(--sh-xs);
+}
+.btn-outline:hover{background:var(--slate);border-color:var(--border)}
+.btn-ghost{
+  background:transparent;color:var(--t3);
+  border:1.5px solid transparent;padding:9px 14px;
+}
+.btn-ghost:hover{background:var(--canvas);color:var(--t2);border-color:var(--border)}
+.btn-outline.active{
+  background:var(--sky);
+  border-color:var(--cobalt-mid);
+  color:var(--cobalt);
+}
+.btn-danger{
+  background:transparent;color:var(--red);
+  border:1.5px solid rgba(153,27,27,.15);
+  padding:9px 14px;
+}
+.btn-danger:hover{background:var(--red-bg);border-color:rgba(153,27,27,.3)}
+.btn-sm{padding:7px 13px;font-size:12px}
+
+/* ═══════════════════════════════════════════════════════
+   PAINEL DIREITO — PRÉVIA
+═══════════════════════════════════════════════════════ */
+.preview-panel{
+  position:sticky;top:80px;
+  display:none;flex-direction:column;gap:0;
+}
+.show-preview .preview-panel{
+  display:flex;
+}
+.preview-head{
+  background:var(--canvas);
+  border:1.5px solid var(--border);
+  border-bottom:none;
+  border-radius:var(--r12) var(--r12) 0 0;
+  padding:11px 16px;
+  display:flex;align-items:center;gap:10px;
+}
+.preview-title{flex:1;font-size:11.5px;font-weight:700;color:var(--t2);letter-spacing:.1px}
+.preview-live{
+  display:flex;align-items:center;gap:5px;
+  font-size:10.5px;font-weight:600;color:#15803d;
+}
+.live-pip{
+  width:7px;height:7px;border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 0 3px rgba(34,197,94,.18);
+  animation:blink 2s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.preview-viewport{
+  background:#3d4e60;
+  border:1.5px solid var(--border);
+  border-top:none;
+  border-radius:0 0 var(--r12) var(--r12);
+  padding:18px;
+  height:72vh;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:#6b7280 #3d4e60;
+}
+
+/* A4 SHEET */
+.a4{
+  background:#fff;
+  width:100%;
+  aspect-ratio:210/297;
+  position:relative;
+  overflow:hidden;
+  /* tipografia A4 */
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:8px;
+  line-height:1.55;
+  color:#111;
+  padding:22px 26px 18px;
+  /* sombra de papel */
+  box-shadow:
+    0 4px 6px rgba(0,0,0,.15),
+    0 12px 32px rgba(0,0,0,.25),
+    inset 0 0 0 .5px rgba(0,0,0,.08);
+}
+
+/* Borda decorativa A4 */
+.a4::after{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,#1a3f7a,#2356a8,#3b74cc);
+}
+
+/* Cabeçalho do documento */
+.d-head{
+  display:flex;align-items:center;gap:8px;
+  padding-bottom:6px;
+  border-bottom:2px solid #1a3f7a;
+  margin-bottom:5px;
+}
+.d-logo{width:30px;height:30px;object-fit:contain;border-radius:2px;flex-shrink:0}
+.d-logo-ph{
+  width:30px;height:30px;flex-shrink:0;
+  background:#e8f2ff;border-radius:2px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:5px;color:#1a3f7a;text-align:center;
+  line-height:1.2;border:1px solid #c0d8f8;
+  font-family:sans-serif;
+}
+.d-inst{flex:1;min-width:0}
+.d-inst-name{font-size:8.5px;font-weight:bold;color:#0c1825;display:block;line-height:1.2;margin-bottom:1px}
+.d-inst-info{font-size:6px;color:#4b5563;display:block}
+.d-emissao{font-size:6px;color:#6b7280;text-align:right;flex-shrink:0;line-height:1.6}
+
+/* Banner do tipo de documento */
+.d-banner{
+  background:linear-gradient(135deg,#1a3f7a 0%,#2356a8 100%);
+  color:#fff;text-align:center;
+  padding:5px 8px;border-radius:2px;
+  margin:5px 0 6px;
+}
+.d-banner-code{font-size:6.5px;opacity:.75;display:block;font-family:monospace;letter-spacing:1px;margin-bottom:1px}
+.d-banner-name{font-size:9.5px;font-weight:bold;display:block;letter-spacing:.5px}
+
+/* Seção A4 */
+.d-sec{margin-bottom:5px;page-break-inside:avoid}
+.d-sec-t{
+  font-size:6px;font-weight:bold;
+  color:#1a3f7a;text-transform:uppercase;
+  letter-spacing:.8px;
+  border-bottom:.5px solid #c5d8f5;
+  padding-bottom:2px;margin-bottom:3px;
+  font-family:monospace;
+}
+.d-row{display:flex;gap:5px;margin-bottom:2.5px}
+.d-cell{flex:1;min-width:0}
+.d-lbl{font-size:5.5px;font-weight:bold;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:.5px}
+.d-val{font-size:7px;color:#111;border-bottom:.5px solid #e5e7eb;min-height:9.5px;padding-bottom:1px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d-blk{font-size:6.5px;line-height:1.55;color:#1f2937;border:.5px solid #e9ecef;padding:3px 5px;border-radius:1.5px;background:#fafafa;white-space:pre-wrap;margin-bottom:2.5px}
+.d-blk-lbl{font-size:5.5px;font-weight:bold;color:#374151;display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.3px}
+
+/* Assinaturas */
+.d-sigs{display:flex;gap:8px;margin-top:10px;padding-top:0}
+.d-sig{flex:1;text-align:center}
+.d-sig-line{font-size:7px;color:#374151;border-top:.5px solid #374151;padding-top:2px;min-height:12px}
+.d-sig-lbl{font-size:5.5px;color:#6b7280;margin-top:1px;display:block}
+
+/* Tabela A4 */
+.d-tbl{width:100%;border-collapse:collapse;font-size:6px;margin-bottom:3px}
+.d-tbl th{background:#1a3f7a;color:#fff;padding:2.5px 4px;text-align:left;font-weight:600;font-size:5.5px;letter-spacing:.3px}
+.d-tbl td{border:.5px solid #e5e7eb;padding:2px 4px;color:#111}
+.d-tbl tr:nth-child(even) td{background:#f1f5fb}
+
+/* Rodapé */
+.d-footer{
+  position:absolute;bottom:8px;left:26px;right:26px;
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:.5px solid #e9ecef;padding-top:3px;
+}
+.d-footer span{font-size:5px;color:#c8d0da;font-family:sans-serif}
+
+/* ═══════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:28px;right:28px;z-index:9999;
+  padding:12px 20px;border-radius:var(--r12);
+  font-size:13.5px;font-weight:600;
+  box-shadow:var(--sh-xl);
+  transform:translateY(90px) scale(.95);opacity:0;
+  transition:all .32s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;max-width:380px;
+  display:flex;align-items:center;gap:10px;
+}
+.toast.show{transform:translateY(0) scale(1);opacity:1}
+.toast.info{background:var(--ink);color:#fff;border:1px solid rgba(255,255,255,.1)}
+.toast.ok{background:#14532d;color:#fff;border:1px solid rgba(74,222,128,.25)}
+.toast.err{background:#7f1d1d;color:#fff;border:1px solid rgba(248,113,113,.25)}
+.toast-icon{font-size:16px;line-height:1;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════ */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#c8d0da;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#a0adb8}
+
+
+/* ═══════════════════════════════════════════════════════
+   ACESSIBILIDADE
+═══════════════════════════════════════════════════════ */
+
+/* Painel flutuante */
+.a11y-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:20px;
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.85);
+  font-family:var(--f-body);font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;letter-spacing:.2px;
+  white-space:nowrap;
+}
+.a11y-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35)}
+.a11y-btn svg{flex-shrink:0}
+
+.a11y-panel{
+  position:fixed;top:66px;right:28px;
+  width:300px;
+  background:var(--canvas);
+  border:1.5px solid var(--border);
+  border-radius:var(--r16);
+  box-shadow:var(--sh-xl);
+  z-index:500;
+  overflow:hidden;
+  display:none;
+  animation:slideDown .2s ease;
+}
+.a11y-panel.open{display:block}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+.a11y-head{
+  padding:16px 20px 14px;
+  background:linear-gradient(135deg,var(--ink-2),var(--cobalt));
+  display:flex;align-items:center;gap:10px;
+}
+.a11y-head-icon{
+  width:36px;height:36px;border-radius:var(--r8);
+  background:rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.a11y-head h3{
+  font-family:var(--f-display);font-size:15px;color:#fff;flex:1;
+}
+.a11y-head p{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.a11y-close{
+  background:rgba(255,255,255,.1);border:none;
+  color:rgba(255,255,255,.7);width:26px;height:26px;
+  border-radius:50%;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .14s;flex-shrink:0;
+}
+.a11y-close:hover{background:rgba(255,255,255,.25);color:#fff}
+
+.a11y-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:16px}
+
+.a11y-group{}
+.a11y-group-label{
+  font-size:9.5px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--cobalt-mid);
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.a11y-group-label::after{content:'';flex:1;height:1px;background:var(--border-lt)}
+
+/* Controle de fonte */
+.font-control{
+  display:flex;align-items:center;gap:0;
+  background:var(--slate);border:1.5px solid var(--border);
+  border-radius:var(--r8);overflow:hidden;
+}
+.font-btn{
+  width:40px;height:40px;border:none;background:transparent;
+  cursor:pointer;font-size:16px;font-weight:700;color:var(--t2);
+  transition:background .14s;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.font-btn:hover{background:var(--sky-deep);color:var(--cobalt)}
+.font-display{
+  flex:1;text-align:center;
+  font-size:13px;font-weight:700;color:var(--text);
+  font-family:var(--f-mono);letter-spacing:.5px;
+}
+.font-presets{display:flex;gap:6px;margin-top:8px}
+.font-preset{
+  flex:1;padding:7px 4px;
+  background:var(--slate);border:1.5px solid var(--border);
+  border-radius:var(--r5);cursor:pointer;
+  text-align:center;font-family:var(--f-body);
+  font-weight:600;color:var(--t2);
+  transition:all .14s;
+}
+.font-preset:hover{border-color:var(--cobalt-mid);color:var(--cobalt);background:var(--sky)}
+.font-preset.active{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.font-preset span{display:block;font-size:11px;font-weight:400;color:inherit;opacity:.7;margin-top:1px}
+
+/* Toggles */
+.a11y-toggles{display:flex;flex-direction:column;gap:8px}
+.a11y-toggle{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;
+  background:var(--slate);border:1.5px solid var(--border);
+  border-radius:var(--r8);cursor:pointer;
+  transition:border-color .14s,background .14s;
+}
+.a11y-toggle:hover{border-color:var(--border)}
+.a11y-toggle-icon{
+  width:32px;height:32px;border-radius:var(--r5);
+  background:var(--sky);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:16px;
+}
+.a11y-toggle-text{flex:1}
+.a11y-toggle-text strong{font-size:12.5px;font-weight:600;color:var(--text);display:block;line-height:1.3}
+.a11y-toggle-text span{font-size:11px;color:var(--t3)}
+.a11y-switch{
+  width:38px;height:22px;border-radius:11px;
+  background:var(--t5);position:relative;
+  transition:background .2s;flex-shrink:0;
+}
+.a11y-switch::after{
+  content:'';position:absolute;
+  top:3px;left:3px;
+  width:16px;height:16px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);
+  transition:transform .2s;
+}
+.a11y-toggle.on .a11y-switch{background:var(--cobalt-mid)}
+.a11y-toggle.on .a11y-switch::after{transform:translateX(16px)}
+
+/* Barra de progresso da fonte */
+.font-bar{
+  height:4px;background:var(--border-lt);border-radius:2px;
+  margin-top:8px;overflow:hidden;
+}
+.font-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--cobalt),var(--cobalt-lt));
+  border-radius:2px;transition:width .2s;
+}
+
+/* Reset btn */
+.a11y-reset{
+  width:100%;padding:9px;
+  background:transparent;border:1.5px solid var(--border);
+  border-radius:var(--r8);color:var(--t3);
+  font-family:var(--f-body);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .14s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.a11y-reset:hover{background:var(--red-bg);color:var(--red);border-color:rgba(153,27,27,.25)}
+
+/* ── MODOS DE ACESSIBILIDADE ── */
+
+/* Alto Contraste */
+body.a11y-contrast{
+  --bg:#000;--canvas:#0a0a0a;--surface2:#111;
+  --border:#444;--border-lt:#333;--slate:#111;
+  --text:#fff;--t2:#f0f0f0;--t3:#ccc;--t4:#999;--t5:#666;
+  --sky:#001a33;--sky-deep:#002244;
+  --cobalt:#4d9fff;--cobalt-mid:#5ba8ff;--cobalt-lt:#7bbfff;
+  --blue-pale:#001122;
+}
+body.a11y-contrast input,
+body.a11y-contrast select,
+body.a11y-contrast textarea{
+  background:#111;color:#fff;border-color:#555;
+}
+body.a11y-contrast input::placeholder,
+body.a11y-contrast textarea::placeholder{color:#666}
+
+/* Espaçamento ampliado */
+body.a11y-spacing label{font-size:13px;margin-bottom:3px}
+body.a11y-spacing input,
+body.a11y-spacing select,
+body.a11y-spacing textarea{padding:13px 14px;font-size:15px}
+body.a11y-spacing .fsec{margin-bottom:36px}
+body.a11y-spacing .fg{gap:18px}
+body.a11y-spacing .form-body>*:first-child{margin-top:30px}
+
+/* Sublinha nos campos */
+body.a11y-underline input,
+body.a11y-underline select,
+body.a11y-underline textarea{
+  border-radius:0;
+  border-top:none;border-left:none;border-right:none;
+  border-bottom:2.5px solid var(--cobalt-mid);
+  background:transparent;padding-left:2px;
+}
+body.a11y-underline input:focus,
+body.a11y-underline select:focus,
+body.a11y-underline textarea:focus{
+  box-shadow:none;
+  border-bottom-color:var(--cobalt-lt);
+  background:var(--sky);
+}
+
+
+/* ═══════════════════════════════════════════════════
+   ESCALAS DE FONTE — ACESSIBILIDADE
+   Afeta apenas o formulário; topbar/tabs não mudam
+═══════════════════════════════════════════════════ */
+/* fz-100: padrão — sem override necessário */
+
+/* fz-108: Médio */
+.fz-108 .form-body label                  { font-size: 12.5px }
+.fz-108 .form-body input,
+.fz-108 .form-body select,
+.fz-108 .form-body textarea               { font-size: 14.5px }
+.fz-108 .form-body .fsec-title            { font-size: 11px }
+.fz-108 .form-head-text h2                { font-size: 20px }
+.fz-108 .form-actions .btn                { font-size: 14px }
+
+/* fz-115: Grande */
+.fz-115 .form-body label                  { font-size: 13.5px }
+.fz-115 .form-body input,
+.fz-115 .form-body select,
+.fz-115 .form-body textarea               { font-size: 15.5px; padding: 11px 13px }
+.fz-115 .form-body .fsec-title            { font-size: 12px }
+.fz-115 .form-head-text h2                { font-size: 22px }
+.fz-115 .form-actions .btn                { font-size: 15px }
+
+/* fz-130: Muito Grande */
+.fz-130 .form-body label                  { font-size: 15px }
+.fz-130 .form-body input,
+.fz-130 .form-body select,
+.fz-130 .form-body textarea               { font-size: 17px; padding: 12px 14px }
+.fz-130 .form-body .fsec-title            { font-size: 13px }
+.fz-130 .form-head-text h2                { font-size: 24px }
+.fz-130 .form-head-text p                 { font-size: 13px }
+.fz-130 .form-actions .btn                { font-size: 16px }
+.fz-130 .form-body .fg                    { gap: 16px }
+.fz-130 .form-body .fsec                  { margin-bottom: 32px }
+.fz-130 .fsec-num                         { font-size: 11px }
+
+/* fz-150: Máximo */
+.fz-150 .form-body label                  { font-size: 17px }
+.fz-150 .form-body input,
+.fz-150 .form-body select,
+.fz-150 .form-body textarea               { font-size: 19px; padding: 13px 15px }
+.fz-150 .form-body .fsec-title            { font-size: 14px }
+.fz-150 .form-head-text h2                { font-size: 26px }
+.fz-150 .form-head-text p                 { font-size: 14px }
+.fz-150 .form-actions .btn                { font-size: 17px; padding: 11px 20px }
+.fz-150 .form-body .fg                    { gap: 18px }
+.fz-150 .form-body .fsec                  { margin-bottom: 36px }
+.fz-150 .fsec-num                         { font-size: 12px; padding: 3px 9px }
+.fz-150 .form-body input::placeholder,
+.fz-150 .form-body textarea::placeholder  { font-size: 17px }
+
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="tbar-logo-slot" id="logoSlot" title="Clique para carregar a logotipo da instituição"
+      onclick="document.getElementById('logoFileInput').click()">
+      <img id="logoImg" alt="Logo">
+      <span id="logoTxt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 2px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Inserir logo da instituição
+      </span>
+    </div>
+    <input type="file" id="logoFileInput" accept="image/*" onchange="loadLogo(this)">
+    <div class="tbar-brand">
+      <h1>Central de Relatórios <span class="sep">·</span> <span class="sub">Portal do Educador</span></h1>
+    </div>
+    <div class="tbar-meta">
+      <div class="tbar-autosave">
+        <div class="tbar-dot"></div>
+        <span id="saveStatus">Auto-save ativo</span>
+      </div>
+      <button class="a11y-btn" onclick="toggleA11y()" id="a11yBtn" title="Opções de Acessibilidade">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="4" r="2"/><path d="M15.09 8.26A5 5 0 0 1 17 12v8"/><path d="M8.91 8.26A5 5 0 0 0 7 12v8"/><line x1="12" y1="10" x2="12" y2="20"/><line x1="7" y1="14" x2="17" y2="14"/>
+        </svg>
+        Acessibilidade
+      </button>
+      <div class="tbar-badge">NEWPC · Portal do Educador</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ BARRA DE TABS ══ -->
+<nav class="tabbar">
+  <div class="tabbar-inner">
+    <div class="tabbar-label">Selecione o tipo de documento</div>
+    <div class="tab-rail" id="tabRail"></div>
+  </div>
+</nav>
+
+<!-- ══ WORKSPACE ══ -->
+<div class="workspace">
+
+  <!-- ── FORMULÁRIO ── -->
+  <div class="form-panel">
+    <div class="form-head" id="formHead"></div>
+    <div class="form-body" id="formBody"></div>
+    <div class="form-actions">
+      <div class="act-primary">
+        <button class="btn btn-primary" onclick="doExport()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          Exportar PDF
+        </button>
+        <button class="btn btn-outline" onclick="doPrint()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Imprimir
+        </button>
+        <button class="btn btn-outline" id="btnPrevia" onclick="togglePrevia()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          Pré-visualizar
+        </button>
+      </div>
+      <div class="act-secondary">
+        <button class="btn btn-ghost btn-sm" onclick="doSave()" title="Salvar dados">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Salvar
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="doLoad()" title="Restaurar dados salvos">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.76"/></svg>
+          Restaurar
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="doClear()" title="Limpar formulário">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Limpar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRÉVIA ── -->
+  <div class="preview-panel">
+    <div class="preview-head">
+      <span class="preview-title">Pré-visualização · Documento Oficial</span>
+      <div class="preview-live"><div class="live-pip"></div>Ao vivo</div>
+    </div>
+    <div class="preview-viewport">
+      <div class="a4" id="a4Doc"></div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══ PAINEL ACESSIBILIDADE ══ -->
+<div class="a11y-panel" id="a11yPanel">
+  <div class="a11y-head">
+    <div class="a11y-head-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="4" r="2"/><path d="M15.09 8.26A5 5 0 0 1 17 12v8"/><path d="M8.91 8.26A5 5 0 0 0 7 12v8"/>
+        <line x1="12" y1="10" x2="12" y2="20"/><line x1="7" y1="14" x2="17" y2="14"/>
+      </svg>
+    </div>
+    <div>
+      <h3>Acessibilidade</h3>
+      <p>Ajuste a leitura conforme sua necessidade</p>
+    </div>
+    <button class="a11y-close" onclick="toggleA11y()">✕</button>
+  </div>
+  <div class="a11y-body">
+
+    <!-- TAMANHO DA FONTE -->
+    <div class="a11y-group">
+      <div class="a11y-group-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><text x="2" y="18" font-size="16" fill="currentColor" stroke="none">A</text></svg>
+        Tamanho da Fonte
+      </div>
+      <div class="font-control">
+        <button class="font-btn" onclick="changeFont(-1)" title="Diminuir fonte">−</button>
+        <span class="font-display" id="fontDisplay">100%</span>
+        <button class="font-btn" onclick="changeFont(1)" title="Aumentar fonte">+</button>
+      </div>
+      <div class="font-bar"><div class="font-bar-fill" id="fontBarFill" style="width:50%"></div></div>
+      <div class="font-presets">
+        <button class="font-preset active" data-pct="100" onclick="setFontPreset(this,100)">
+          A<span>Padrão</span>
+        </button>
+        <button class="font-preset" data-pct="115" onclick="setFontPreset(this,115)">
+          <span style="font-size:14px">A</span><span>Médio</span>
+        </button>
+        <button class="font-preset" data-pct="130" onclick="setFontPreset(this,130)">
+          <span style="font-size:16px">A</span><span>Grande</span>
+        </button>
+        <button class="font-preset" data-pct="150" onclick="setFontPreset(this,150)">
+          <span style="font-size:19px">A</span><span>Muito Grande</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TOGGLES VISUAIS -->
+    <div class="a11y-group">
+      <div class="a11y-group-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M2 12h2m16 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        Modos Visuais
+      </div>
+      <div class="a11y-toggles">
+        <div class="a11y-toggle" id="tog-contrast" onclick="toggleMode('contrast','tog-contrast')">
+          <div class="a11y-toggle-icon">🌑</div>
+          <div class="a11y-toggle-text">
+            <strong>Alto Contraste</strong>
+            <span>Fundo escuro, texto claro</span>
+          </div>
+          <div class="a11y-switch"></div>
+        </div>
+        <div class="a11y-toggle" id="tog-spacing" onclick="toggleMode('spacing','tog-spacing')">
+          <div class="a11y-toggle-icon">↕️</div>
+          <div class="a11y-toggle-text">
+            <strong>Espaçamento Ampliado</strong>
+            <span>Campos maiores, mais fácil de preencher</span>
+          </div>
+          <div class="a11y-switch"></div>
+        </div>
+        <div class="a11y-toggle" id="tog-underline" onclick="toggleMode('underline','tog-underline')">
+          <div class="a11y-toggle-icon">✏️</div>
+          <div class="a11y-toggle-text">
+            <strong>Campos Sublinhados</strong>
+            <span>Estilo caderno, mais familiar</span>
+          </div>
+          <div class="a11y-switch"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESET -->
+    <button class="a11y-reset" onclick="resetA11y()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.76"/></svg>
+      Restaurar Padrões
+    </button>
+
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon"></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+   DEFINIÇÃO DAS ABAS
+════════════════════════════════════════════════ */
+const TABS = [
+  { id:'DC',  label:'Diário\nde Classe',        name:'Diário de Classe',                desc:'Registro diário de aulas, frequência e atividades pedagógicas da turma.' },
+  { id:'PA',  label:'Plano\nde Aula',           name:'Plano de Aula',                   desc:'Planejamento estruturado: objetivos, BNCC, metodologia e avaliação.' },
+  { id:'RO',  label:'Registro\nOcorrência',     name:'Registro de Ocorrência',          desc:'Documentação formal de ocorrências disciplinares e situações relevantes.' },
+  { id:'RMD', label:'Relatório\nMensal',        name:'Relatório Mensal de Desempenho',  desc:'Acompanhamento mensal: pedagógico, frequência, comportamento e família.' },
+  { id:'RBA', label:'Relatório\nBimestral',     name:'Relatório Bimestral',             desc:'Avaliação bimestral por componente curricular com parecer descritivo.' },
+  { id:'RS',  label:'Relatório\nSemestral',     name:'Relatório Semestral',             desc:'Síntese semestral: aprendizagem, socialização, avanços e recomendações.' },
+  { id:'HE',  label:'Histórico\nEscolar',       name:'Histórico Escolar',               desc:'Trajetória completa com resultados anuais e situação escolar.' },
+  { id:'PEI', label:'Pl. Ed.\nIndividualiz.',   name:'Plano Educacional Individualizado',desc:'Planejamento pedagógico personalizado para alunos com necessidades específicas.' },
+  { id:'AEE', label:'At. Ed.\nEspecializ.',     name:'Atendimento Educacional Especializado',desc:'Registro do AEE — Sala de Recursos Multifuncionais.' },
+  { id:'RDI', label:'Desenv.\nIndividual',      name:'Relatório de Desenvolvimento Individual',desc:'Avaliação integral: cognitivo, motor, linguagem, social e autonomia.' },
+  { id:'PPP', label:'Proj. Pol.\nPedagógico',   name:'Projeto Político-Pedagógico',     desc:'Missão, visão, diagnóstico, metas e planejamento institucional.' },
+  { id:'PDE', label:'Pl. Desenv.\nda Escola',   name:'Plano de Desenvolvimento da Escola',desc:'Plano estratégico: diagnóstico, metas, ações e indicadores de resultado.' },
+  { id:'PDI', label:'PDI\nIndividual',          name:'Plano de Desenvolvimento Individual',desc:'Plano de metas e estratégias para o desenvolvimento integral do aluno com NEE.' },
+  { id:'API', label:'Aval. Pedag.\nIndividual', name:'Avaliação Pedagógica Individual',   desc:'Avaliação detalhada das habilidades e necessidades pedagógicas do aluno com NEE.' },
+  { id:'PAEE',label:'Plano\nAEE',               name:'Plano de AEE',                      desc:'Planejamento específico do Atendimento Educacional Especializado para o aluno.' },
+  { id:'TEA', label:'Relatório\nTEA',           name:'Relatório para Alunos com TEA',     desc:'Relatório especializado para alunos com Transtorno do Espectro Autista.' },
+];
+
+/* ════════════════════════════════════════════════
+   ESTADO
+════════════════════════════════════════════════ */
+let curIdx = 0, logoDataURL = null, attachedImgs = [];
+
+/* ════════════════════════════════════════════════
+   UTILITÁRIOS
+════════════════════════════════════════════════ */
+function today() { return new Date().toISOString().slice(0,10); }
+function fmtDate(v) {
+  if (!v) return '';
+  const p = v.split('-');
+  return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : v;
+}
+function esc(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+function gd(d,k,fb='') { return (d[k]||fb).toString().trim(); }
+function debounce(fn,ms) { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
+
+function showToast(msg, type='info', icon='') {
+  const el=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').textContent = icon||{info:'💬',ok:'✓',err:'✕'}[type]||'';
+  el.className = `toast ${type}`;
+  setTimeout(()=>el.classList.add('show'),10);
+  setTimeout(()=>el.classList.remove('show'),3800);
+}
+
+/* ════════════════════════════════════════════════
+   HELPERS DE MARKUP DE FORMULÁRIO
+════════════════════════════════════════════════ */
+function sec(title, num, cols, ...fields) {
+  const grid = cols === 1 ? 'fg' : cols === 2 ? 'fg fg-2' : cols === 3 ? 'fg fg-3' : `fg ${cols}`;
+  return `<div class="fsec">
+    <div class="fsec-head">
+      ${num ? `<span class="fsec-num">${num}</span>` : ''}
+      <span class="fsec-title">${title}</span>
+    </div>
+    <div class="${grid}">${fields.join('')}</div>
+  </div>`;
+}
+function secFree(title, num, html) {
+  return `<div class="fsec">
+    <div class="fsec-head">
+      ${num ? `<span class="fsec-num">${num}</span>` : ''}
+      <span class="fsec-title">${title}</span>
+    </div>
+    ${html}
+  </div>`;
+}
+function f(label, html, span) {
+  return `<div class="field${span?' '+span:''}">${label?`<label>${label}</label>`:''}${html}</div>`;
+}
+function inp(name, ph, type, val, ro) {
+  const t=type||'text', v=val?` value="${esc(val)}"`:'', r=ro?' readonly':'';
+  return `<input type="${t}" data-f="${name}" placeholder="${ph||''}"${v}${r}>`;
+}
+function sel(name, opts, first) {
+  const o=opts.map(x=>`<option>${esc(x)}</option>`).join('');
+  return `<select data-f="${name}"><option value="">${first||'Selecione...'}</option>${o}</select>`;
+}
+function ta(name, ph, cls) {
+  return `<textarea data-f="${name}" class="${cls||''}" placeholder="${ph||''}"></textarea>`;
+}
+function dt(name, val) {
+  return `<input type="date" data-f="${name}"${val?` value="${val}"`:''}>`; 
+}
+
+/* ════════════════════════════════════════════════
+   SEÇÕES REUTILIZÁVEIS
+════════════════════════════════════════════════ */
+function sInstit() {
+  return sec('Identificação Institucional','01', 2,
+    f('Nome da Instituição de Ensino', inp('i_nome','E.M.E.F. Professora Maria das Dores'), 's2'),
+    f('Rede de Ensino',  sel('i_rede', ['Municipal','Estadual','Federal','Privada'])),
+    f('Município / Estado', inp('i_mun','Campo Grande / MS')),
+    f('Endereço', inp('i_end','Rua, número, bairro, CEP'), 's2'),
+    f('Telefone', inp('i_tel','(67) 3000-0000','tel')),
+    f('E-mail', inp('i_email','escola@semed.gov.br','email'))
+  );
+}
+function sDocumento(tipName) {
+  return sec('Dados do Documento','02', 3,
+    f('Tipo de Documento', inp('d_tipo','',undefined,tipName,true)),
+    f('Código / Nº', inp('d_cod','001/2025')),
+    f('Data de Emissão', dt('d_emissao', today())),
+    f('Período de Referência', inp('d_periodo','Ex.: Maio/2025')),
+    f('Ano Letivo', inp('d_ano','2025')),
+    f('Etapa de Ensino', sel('d_etapa',['Educação Infantil','Ensino Fundamental I','Ensino Fundamental II','Ensino Médio','EJA'])),
+    f('Série / Ano', inp('d_serie','Ex.: 3º Ano')),
+    f('Turma', inp('d_turma','Ex.: A')),
+    f('Turno', sel('d_turno',['Matutino','Vespertino','Noturno','Integral']))
+  );
+}
+function sProfessor() {
+  return sec('Professor / Responsável','03', 2,
+    f('Nome Completo', inp('p_nome','Nome completo do professor'), 's2'),
+    f('Disciplina / Componente', inp('p_disc','Ex.: Língua Portuguesa')),
+    f('Função', inp('p_func','Ex.: Professor, Coordenador')),
+    f('Matrícula Funcional', inp('p_mat','Ex.: 12.345-6')),
+    f('Local e Data', inp('p_ld','Ex.: Campo Grande, 15/05/2025'))
+  );
+}
+function sAluno(nee) {
+  return sec('Identificação do Aluno','04', 2,
+    f('Nome Completo', inp('a_nome','Nome completo do aluno'), 's2'),
+    f('Data de Nascimento', dt('a_nasc')),
+    f('Matrícula', inp('a_mat','Ex.: 2025001')),
+    f('Nome da Mãe', inp('a_mae','Nome completo')),
+    f('Pai / Responsável', inp('a_pai','Nome completo')),
+    f('Telefone do Responsável', inp('a_tel','(67) 9 9000-0000','tel')),
+    f('Sala / Turma', inp('a_sala','Ex.: Sala 5 – 3º Ano A')),
+    f('Frequência (%)', inp('a_freq','Ex.: 85','number')),
+    f('Situação', sel('a_sit',['Em curso','Aprovado','Reprovado','Transferido','Evadido'])),
+    nee ? f('Diagnóstico / Necessidades Específicas', ta('a_nee','Diagnósticos, condições de saúde, NEE...','md'), 's2') : ''
+  );
+}
+function sAssinaturas() {
+  return sec('Assinaturas e Validação','', 2,
+    f('Assinatura do Professor', inp('s_prof','Nome / assinatura digitada')),
+    f('Assinatura da Coordenação', inp('s_coord','Nome / assinatura digitada')),
+    f('Assinatura da Direção', inp('s_dir','Nome / assinatura digitada')),
+    f('Carimbo / Observação Final', inp('s_carimbo','Ex.: Secretaria Municipal de Educação'))
+  );
+}
+function sImagens() {
+  return secFree('Imagens Complementares','',`
+    <div class="img-drop" onclick="document.getElementById('imgFileInput').click()">
+      <div class="img-drop-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b74cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <p>Clique para adicionar imagens ao relatório</p>
+      <small>JPG, PNG, GIF · Múltiplas imagens</small>
+    </div>
+    <input type="file" id="imgFileInput" accept="image/*" multiple style="display:none" onchange="onImgs(this)">
+    <div class="img-grid" id="imgGrid"></div>
+  `);
+}
+
+/* ════════════════════════════════════════════════
+   FORMULÁRIOS POR TIPO
+════════════════════════════════════════════════ */
+function buildForm(i) {
+  const t = TABS[i];
+  switch (t.id) {
+    case 'DC':  return formDC(t);
+    case 'PA':  return formPA(t);
+    case 'RO':  return formRO(t);
+    case 'RMD': return formRMD(t);
+    case 'RBA': return formRBA(t);
+    case 'RS':  return formRS(t);
+    case 'HE':  return formHE(t);
+    case 'PEI': return formPEI(t);
+    case 'AEE': return formAEE(t);
+    case 'RDI': return formRDI(t);
+    case 'PPP': return formPPP(t);
+    case 'PDE': return formPDE(t);
+    case 'PDI': return formPDI(t);
+    case 'API': return formAPI(t);
+    case 'PAEE': return formPAEE(t);
+    case 'TEA': return formTEA(t);
+    default: return '';
+  }
+}
+
+function formDC(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() +
+  sec('Registro da Aula','05', 2,
+    f('Data da Aula', dt('dc_data', today())),
+    f('Duração / Nº de Aulas', inp('dc_dur','Ex.: 2 aulas de 50 min')),
+    f('Conteúdo Ministrado', ta('dc_cont','Descreva os conteúdos, habilidades BNCC trabalhadas, capítulos do livro didático...','lg'), 's2'),
+    f('Metodologia Aplicada', ta('dc_met','Aula expositiva, rotação por estações, lousa digital, Google Workspace, debate...','md'), 's2'),
+    f('Atividades Realizadas', ta('dc_atv','Exercícios, produções textuais, pesquisas, experimentos, jogos pedagógicos...','md'), 's2'),
+    f('Alunos Presentes', inp('dc_pres','Ex.: 28','number')),
+    f('Alunos Ausentes', inp('dc_aus','Ex.: 4','number')),
+    f('Observações do Dia', ta('dc_obs','Intercorrências, alunos com atenção específica, adaptações realizadas...','lg'), 's2')
+  ) + sAssinaturas() + sImagens();
+}
+
+function formPA(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() +
+  sec('Identificação da Aula','05', 2,
+    f('Tema / Título da Aula', inp('pa_tema','Ex.: Frações no cotidiano – dividindo igualmente'), 's2'),
+    f('Data(s) de Aplicação', inp('pa_datas','Ex.: 12 e 14/05/2025')),
+    f('Duração Total', inp('pa_dur','Ex.: 2 aulas de 50 min'))
+  ) +
+  sec('Objetivos e Habilidades','06', 1,
+    f('Objetivo Geral', ta('pa_objg','Ao final desta aula, o aluno será capaz de...','sm')),
+    f('Objetivos Específicos', ta('pa_obje','• Identificar...\n• Relacionar...\n• Resolver...','md')),
+    f('Habilidades da BNCC', ta('pa_bncc','Ex.: EF05MA07 – Resolver e elaborar problemas com frações...','md'))
+  ) +
+  sec('Desenvolvimento','07', 1,
+    f('Conteúdos', ta('pa_cont','Conceituais, procedimentais e atitudinais...')),
+    f('Metodologia e Estratégias de Ensino', ta('pa_met','Abertura (0–10 min): problematização inicial...\nDesenvolvimento (10–40 min): atividade principal...\nFechamento (40–50 min): síntese e registro...','xl')),
+    f('Recursos Didáticos', ta('pa_rec','Lousa digital, Chromebook, materiais manipuláveis, Google Apresentações...')),
+    f('Avaliação', ta('pa_aval','Instrumento, critérios e forma de registro da aprendizagem...','md')),
+    f('Adaptações / Diferenciação', ta('pa_adap','Estratégias para alunos com NEE ou diferentes níveis...'))
+  ) + sAssinaturas() + sImagens();
+}
+
+function formRO(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() +
+  sec('Dados da Ocorrência','05', 2,
+    f('Data', dt('ro_data', today())),
+    f('Horário', inp('ro_hora','Ex.: 09h15')),
+    f('Local', inp('ro_local','Ex.: Sala 5A, Pátio, Corredor'), 's2'),
+    f('Tipo de Ocorrência', sel('ro_tipo',['Indisciplina','Conflito entre alunos','Bullying / Cyberbullying','Acidente / Lesão','Situação de vulnerabilidade','Dano ao patrimônio','Outro'])),
+    f('Gravidade', sel('ro_grav',['Leve','Moderado','Grave'])),
+    f('Envolvidos', ta('ro_env','Nomes e papel de cada pessoa envolvida...','md'), 's2'),
+    f('Descrição Detalhada da Ocorrência', ta('ro_desc','Relate os fatos objetivamente, em ordem cronológica, sem julgamentos...','xl'), 's2'),
+    f('Providências Imediatas', ta('ro_prov','O que foi feito no momento: separação, atendimento médico, comunicação...','md'), 's2'),
+    f('Encaminhamentos Realizados', ta('ro_enc','Família, Conselho Tutelar, medidas disciplinares, acompanhamento psicológico...','md'), 's2'),
+    f('Responsáveis Notificados', ta('ro_notif','Nome, vínculo, meio e data de notificação...'), 's2')
+  ) + sAssinaturas() + sImagens();
+}
+
+function formRMD(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(false) +
+  sec('Desempenho no Período','05', 2,
+    f('Frequência (%)', inp('rm_freq','Ex.: 88','number')),
+    f('Conceito Geral', sel('rm_conc',['Excelente','Ótimo','Bom','Regular','Necessita atenção'])),
+    f('Desempenho Pedagógico', ta('rm_ped','Participação nas aulas, realização de tarefas, avaliações formais...','lg'), 's2'),
+    f('Comportamento e Socialização', ta('rm_comp','Relação com colegas, professores e cumprimento das normas escolares...','md'), 's2'),
+    f('Dificuldades Identificadas', ta('rm_dif','Áreas e habilidades com maior dificuldade no período...','md'), 's2'),
+    f('Avanços Observados', ta('rm_av','Progressos, conquistas e melhorias verificadas no período...','md'), 's2'),
+    f('Recomendações à Família', ta('rm_rec','Sugestões de apoio em casa, orientações e atividades complementares...','lg'), 's2')
+  ) + sAssinaturas() + sImagens();
+}
+
+function formRBA(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(false) +
+  sec('Desempenho por Componente Curricular','05', 1,
+    f('Língua Portuguesa', ta('rb_port','Leitura, produção textual, oralidade — habilidades trabalhadas e nível de domínio...','md')),
+    f('Matemática', ta('rb_mat','Números, operações, geometria, medidas — habilidades trabalhadas e nível de domínio...','md')),
+    f('Ciências da Natureza', ta('rb_cien','Desempenho, habilidades e observações em Ciências...','md')),
+    f('Ciências Humanas (História e Geografia)', ta('rb_hum','Desempenho e observações em História e Geografia...','md')),
+    f('Arte / Ed. Física / Ensino Religioso', ta('rb_out','Desempenho nas demais áreas do conhecimento...','md')),
+    f('Habilidades BNCC Consolidadas', ta('rb_hab','Principais habilidades dominadas ao longo do bimestre...','md')),
+    f('Dificuldades e Pontos de Atenção', ta('rb_dif','O que precisa ser retomado ou reforçado no próximo bimestre...','md')),
+    f('Parecer Descritivo Geral', ta('rb_par','Síntese personalizada e acolhedora do desenvolvimento do aluno no bimestre...','xl'))
+  ) + sAssinaturas() + sImagens();
+}
+
+function formRS(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(false) +
+  sec('Síntese Semestral','05', 2,
+    f('Frequência Semestral (%)', inp('rs_freq','Ex.: 82','number')),
+    f('Conceito / Nota Final', inp('rs_nota','Ex.: 8,5 / Bom')),
+    f('Desempenho Geral no Semestre', ta('rs_desemp','Síntese do desempenho em todos os componentes curriculares...','lg'), 's2'),
+    f('Aspectos Cognitivos', ta('rs_cog','Atenção, memória, raciocínio, leitura, escrita e resolução de problemas...','md'), 's2'),
+    f('Socialização e Comportamento', ta('rs_soc','Relações interpessoais, cooperação, normas, protagonismo e autonomia...','md'), 's2'),
+    f('Avanços e Conquistas', ta('rs_av','Progressos mais relevantes observados no semestre...','md'), 's2'),
+    f('Desafios para o Próximo Semestre', ta('rs_desaf','Aspectos que merecem continuidade de atenção e intervenção...','md'), 's2'),
+    f('Recomendações', ta('rs_rec','Estratégias sugeridas para escola e família no próximo semestre...','lg'), 's2')
+  ) + sAssinaturas() + sImagens();
+}
+
+function formHE(t) {
+  return sInstit() + sDocumento(t.name) + sAluno(false) +
+  secFree('Trajetória Escolar','05',`
+    <p style="font-size:12px;color:var(--t3);margin-bottom:10px;line-height:1.5">
+      Preencha os dados de cada ano letivo cursado. Clique em <strong>+ Adicionar Ano</strong> para inserir novas linhas.
+    </p>
+    <div class="dyn-wrap">
+      <table class="dyn-table" id="heTbl">
+        <thead><tr>
+          <th>Ano Letivo</th><th>Série / Ano</th><th>Instituição</th>
+          <th>Resultado</th><th>Frequência</th><th>Observações</th>
+        </tr></thead>
+        <tbody id="heBody">
+          <tr>
+            <td><input type="text" placeholder="2022"></td>
+            <td><input type="text" placeholder="1º Ano"></td>
+            <td><input type="text" placeholder="Nome da escola"></td>
+            <td><input type="text" placeholder="Aprovado"></td>
+            <td><input type="text" placeholder="90%"></td>
+            <td><input type="text" placeholder="—"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="btn-addrow" onclick="addDynRow('heBody',6)">+ Adicionar Ano</button>
+  `) +
+  sec('Observações do Histórico','', 1,
+    f('Observações Gerais', ta('he_obs','Transferências, afastamentos, retenções, condições especiais relevantes...','lg'))
+  ) + sAssinaturas();
+}
+
+function formPEI(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(true) +
+  sec('Planejamento Individualizado','05', 1,
+    f('Diagnóstico / Condição', ta('pe_diag','Ex.: TEA (CID F84.0), Deficiência Intelectual, TDAH, Síndrome de Down...','md')),
+    f('Necessidades Educacionais Específicas', ta('pe_nee','Áreas: comunicação, cognição, mobilidade, comportamento, socialização...','lg')),
+    f('Objetivos Personalizados de Aprendizagem', ta('pe_obj','Objetivos adaptados às potencialidades e necessidades do aluno, por área...','xl')),
+    f('Estratégias Pedagógicas', ta('pe_est','Metodologias, abordagens e práticas específicas planejadas para o aluno...','lg')),
+    f('Adaptações Curriculares', ta('pe_adap','Conteúdo, tempo, avaliação, ambiente, apresentação das atividades...','md')),
+    f('Recursos de Acessibilidade', ta('pe_aces','Tecnologias assistivas, LIBRAS, Braille, materiais adaptados, softwares...','md')),
+    f('Acompanhamento e Periodicidade', ta('pe_acomp','Quem acompanha, frequência e como os resultados serão registrados...')),
+    f('Equipe Multidisciplinar', ta('pe_equipe','Nomes, funções e área de atuação de todos os profissionais envolvidos...')),
+    f('Critérios de Revisão Periódica do PEI', ta('pe_aval','Como e quando o PEI será revisado e quais indicadores orientarão ajustes...','md'))
+  ) + sAssinaturas() + sImagens();
+}
+
+function formAEE(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(true) +
+  sec('Dados do Atendimento','05', 2,
+    f('Tipo de Atendimento', sel('ae_tipo',['AEE – Sala de Recursos Tipo I','AEE – Sala de Recursos Tipo II','Atendimento Itinerante','Classe Especial','Outro']), 's2'),
+    f('Frequência do Atendimento', inp('ae_freq','Ex.: 2x por semana, 50 min cada')),
+    f('Período de Referência', inp('ae_per','Ex.: Março a Junho/2025')),
+    f('Objetivos do Atendimento', ta('ae_obj','O que se busca desenvolver com o aluno no AEE neste período...','lg'), 's2'),
+    f('Recursos e Materiais Utilizados', ta('ae_rec','Tecnologias assistivas, softwares, materiais adaptados, atividades específicas...','md'), 's2'),
+    f('Evolução Observada', ta('ae_evol','Progresso do aluno nas áreas trabalhadas durante o período de atendimento...','xl'), 's2'),
+    f('Intervenções Realizadas', ta('ae_int','Principais intervenções aplicadas e seus resultados observados...','md'), 's2'),
+    f('Encaminhamentos', ta('ae_enc','Serviços de saúde, assistência social, outros especialistas...','md'), 's2')
+  ) + sAssinaturas() + sImagens();
+}
+
+function formRDI(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(false) +
+  sec('Desenvolvimento Integral','05', 1,
+    f('Aspectos Cognitivos', ta('rd_cog','Atenção, memória, raciocínio, resolução de problemas, leitura e escrita...','lg')),
+    f('Desenvolvimento Motor', ta('rd_mot','Coordenação fina e grossa, lateralidade, psicomotricidade...','md')),
+    f('Linguagem e Comunicação', ta('rd_ling','Expressão oral, vocabulário, compreensão, leitura funcional...','md')),
+    f('Interação Social', ta('rd_soc','Relações com colegas e adultos, empatia, resolução de conflitos...','md')),
+    f('Autonomia e Independência', ta('rd_aut','Organização pessoal, autocuidado, tomada de decisões...','md')),
+    f('Avanços Observados no Período', ta('rd_av','Progresso mais relevante identificado durante o acompanhamento...','lg')),
+    f('Dificuldades e Necessidades de Suporte', ta('rd_dif','Aspectos que ainda requerem intervenção especializada ou suporte...','md')),
+    f('Recomendações Pedagógicas', ta('rd_rec','Estratégias para professores, orientações à família, encaminhamentos...','lg'))
+  ) + sAssinaturas() + sImagens();
+}
+
+function formPPP(t) {
+  return sInstit() + sDocumento(t.name) +
+  sec('Identidade Institucional','03', 1,
+    f('Missão da Escola', ta('pp_miss','Ex.: Promover educação de qualidade, inclusiva e transformadora, comprometida com o desenvolvimento integral dos estudantes...','md')),
+    f('Visão de Futuro', ta('pp_vis','Ex.: Ser reconhecida como escola de excelência na formação integral, referência em inovação pedagógica...','md')),
+    f('Valores Institucionais', ta('pp_val','Ex.: Respeito, ética, inclusão, solidariedade, inovação, protagonismo estudantil...'))
+  ) +
+  sec('Diagnóstico e Planejamento','04', 1,
+    f('Diagnóstico Institucional', ta('pp_diag','Análise da realidade: contexto social, IDEB, infraestrutura, equipe, comunidade, desafios e potencialidades...','xl')),
+    f('Objetivos Gerais', ta('pp_obj','Principais objetivos pedagógicos e institucionais para o período do PPP...','lg')),
+    f('Metas', ta('pp_metas','IDEB, alfabetização, frequência, formação continuada, participação da comunidade...','lg')),
+    f('Ações Pedagógicas', ta('pp_acoes','Projetos, programas, intervenções, eventos, parcerias previstas...','xl')),
+    f('Estratégias de Implementação', ta('pp_est','Como as ações serão postas em prática: metodologias, tecnologias, arranjos pedagógicos...','lg')),
+    f('Cronograma Geral', ta('pp_cron','Linha do tempo das principais ações ao longo do ano letivo...','md')),
+    f('Avaliação Institucional', ta('pp_aval','Indicadores, instrumentos e periodicidade de avaliação dos resultados...','md'))
+  ) + sAssinaturas();
+}
+
+function formPDE(t) {
+  return sInstit() + sDocumento(t.name) +
+  sec('Diagnóstico Estratégico','03', 1,
+    f('Diagnóstico da Escola', ta('pd_diag','Pontos fortes, a melhorar, oportunidades e riscos (SWOT). Dados de aprendizagem, gestão e infraestrutura...','xl')),
+    f('Metas Prioritárias', ta('pd_metas','Metas alinhadas ao IDEB, SAEB e indicadores municipais...','lg'))
+  ) +
+  secFree('Plano de Ação','04',`
+    <p style="font-size:12px;color:var(--t3);margin-bottom:10px;line-height:1.5">
+      Descreva cada ação estratégica do plano. Clique em <strong>+ Adicionar Ação</strong> para inserir novas linhas.
+    </p>
+    <div class="dyn-wrap">
+      <table class="dyn-table">
+        <thead><tr>
+          <th style="min-width:190px">Ação / Iniciativa</th>
+          <th>Responsável</th><th>Prazo</th><th>Indicador</th><th>Status</th>
+        </tr></thead>
+        <tbody id="pdeBody">
+          <tr>
+            <td><input type="text" placeholder="Descreva a ação estratégica..."></td>
+            <td><input type="text" placeholder="Nome/Cargo"></td>
+            <td><input type="text" placeholder="Jun/2025"></td>
+            <td><input type="text" placeholder="Indicador de resultado"></td>
+            <td><input type="text" placeholder="Em andamento"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="btn-addrow" onclick="addDynRow('pdeBody',5)">+ Adicionar Ação</button>
+  `) +
+  sec('Monitoramento','', 2,
+    f('Forma de Acompanhamento', ta('pd_acomp','Como e com qual frequência será monitorada a execução das ações...','md'), 's2'),
+    f('Observações Finais', ta('pd_obs','Informações complementares para o desenvolvimento e acompanhamento do plano...','md'), 's2')
+  ) + sAssinaturas();
+}
+
+
+function formPDI(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(true) +
+  sec('Diagnóstico e Perfil do Aluno','05', 1,
+    f('Diagnóstico / CID', inp('pdi_cid','Ex.: F84.0 – TEA, F70 – Def. Intelectual, F90 – TDAH...')),
+    f('Descrição do Perfil do Aluno', ta('pdi_perfil','Descreva as características gerais do aluno: pontos fortes, desafios, interesses, estilo de aprendizagem e nível atual de desenvolvimento...','lg')),
+    f('Habilidades Já Desenvolvidas', ta('pdi_hab','Liste as habilidades consolidadas nas áreas cognitiva, motora, linguagem, social e autonomia...','md')),
+    f('Necessidades Prioritárias', ta('pdi_nec','Áreas que precisam de maior atenção e intervenção no período atual...','md'))
+  ) +
+  sec('Metas de Desenvolvimento','06', 1,
+    f('Metas Cognitivas / Acadêmicas', ta('pdi_meta_cog','Metas para leitura, escrita, raciocínio, resolução de problemas, atenção e concentração...','lg')),
+    f('Metas de Comunicação e Linguagem', ta('pdi_meta_ling','Metas para expressão oral, vocabulário, compreensão, comunicação alternativa se aplicável...','md')),
+    f('Metas Motoras', ta('pdi_meta_mot','Coordenação fina, grossa, lateralidade, equilíbrio e mobilidade...','md')),
+    f('Metas de Socialização', ta('pdi_meta_soc','Interação com colegas, resolução de conflitos, participação em grupo, vínculos afetivos...','md')),
+    f('Metas de Autonomia', ta('pdi_meta_aut','Autocuidado, organização pessoal, independência nas atividades da vida diária...','md'))
+  ) +
+  sec('Estratégias e Intervenções','07', 1,
+    f('Estratégias Pedagógicas', ta('pdi_est','Metodologias, recursos e abordagens específicas para atingir as metas...','lg')),
+    f('Adaptações Curriculares', ta('pdi_adap','Como o currículo será adaptado: conteúdo, tempo, avaliação, material...','md')),
+    f('Recursos e Tecnologias Assistivas', ta('pdi_rec','Materiais adaptados, softwares, LIBRAS, comunicação alternativa...','md')),
+    f('Profissionais Envolvidos', ta('pdi_prof','Nomes, funções e áreas de todos os profissionais que acompanham o aluno...','md')),
+    f('Periodicidade de Acompanhamento', ta('pdi_per','Com qual frequência o PDI será revisado e por quem...'))
+  ) +
+  sec('Avaliação dos Resultados','08', 2,
+    f('Período de Vigência do PDI', inp('pdi_vigencia','Ex.: Março a Dezembro/2025')),
+    f('Data de Revisão Prevista', inp('pdi_revisao','Ex.: Julho/2025')),
+    f('Critérios de Avaliação das Metas', ta('pdi_crit','Como será avaliado o alcance de cada meta — instrumentos, critérios e indicadores...','lg'), 's2'),
+    f('Observações Complementares', ta('pdi_obs','Informações relevantes sobre o contexto familiar, saúde, medicação ou outros fatores...','md'), 's2')
+  ) + sAssinaturas() + sImagens();
+}
+
+function formAPI(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(true) +
+  sec('Dados da Avaliação','05', 2,
+    f('Data da Avaliação', dt('api_data', today())),
+    f('Tipo de Avaliação', sel('api_tipo',['Avaliação Inicial','Avaliação Semestral','Avaliação Anual','Reavaliação'])),
+    f('Avaliador(es) Responsáveis', inp('api_aval','Nome e função dos profissionais que realizaram a avaliação'), 's2'),
+    f('Instrumentos Utilizados', ta('api_inst','Testes, observações, entrevistas, escalas, relatórios anteriores utilizados na avaliação...','md'), 's2')
+  ) +
+  sec('Avaliação por Área de Desenvolvimento','06', 1,
+    f('Área Cognitiva e Acadêmica', ta('api_cog','Nível de leitura, escrita, raciocínio lógico, atenção, memória, resolução de problemas. Descreva o nível atual com exemplos concretos...','lg')),
+    f('Linguagem e Comunicação', ta('api_ling','Expressão oral e escrita, vocabulário, compreensão, pragmática, uso de comunicação alternativa se houver...','lg')),
+    f('Desenvolvimento Motor', ta('api_mot','Coordenação motora fina e grossa, lateralidade, tônus muscular, mobilidade, escrita manual...','md')),
+    f('Desenvolvimento Socioemocional', ta('api_soc','Relações interpessoais, regulação emocional, empatia, comportamento em grupo, vínculos...','md')),
+    f('Autonomia e Vida Diária', ta('api_aut','Autocuidado, organização, independência nas rotinas escolares e cotidianas...','md')),
+    f('Comportamento e Autorregulação', ta('api_comp','Comportamentos desafiadores, estratégias de regulação, respostas a estímulos sensoriais...','md'))
+  ) +
+  sec('Conclusão e Recomendações','07', 1,
+    f('Síntese dos Resultados', ta('api_sint','Síntese geral dos resultados da avaliação, destacando pontos fortes e áreas prioritárias...','xl')),
+    f('Recomendações Pedagógicas', ta('api_rec_ped','Estratégias e intervenções sugeridas para a equipe escolar...','lg')),
+    f('Recomendações à Família', ta('api_rec_fam','Orientações para apoio em casa e acompanhamento externo...','md')),
+    f('Encaminhamentos Externos', ta('api_enc','Indicação de especialistas, serviços de saúde ou assistência social...','md')),
+    f('Próximos Passos', ta('api_prox','O que será feito a partir desta avaliação — PDI, PEI, intervenções...','md'))
+  ) + sAssinaturas() + sImagens();
+}
+
+function formPAEE(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(true) +
+  sec('Dados do Atendimento AEE','05', 2,
+    f('Sala de Recursos', inp('paee_sala','Nome e localização da Sala de Recursos Multifuncionais'), 's2'),
+    f('Tipo de Sala de Recursos', sel('paee_tipo',['Tipo I – Deficiência Intelectual e Física','Tipo II – Deficiência Visual','Tipo I e II'])),
+    f('Modalidade de Atendimento', sel('paee_mod',['Individual','Em dupla','Em pequeno grupo'])),
+    f('Frequência', inp('paee_freq','Ex.: 2 vezes por semana, 50 min cada')),
+    f('Período de Vigência', inp('paee_vig','Ex.: Março a Dezembro/2025')),
+    f('Turno do AEE', sel('paee_turno',['Contraturno matutino','Contraturno vespertino','Mesmo turno']))
+  ) +
+  sec('Diagnóstico e Justificativa','06', 1,
+    f('Diagnóstico / Condição do Aluno', ta('paee_diag','Diagnóstico clínico, necessidades educacionais específicas identificadas e justificativa para o AEE...','lg')),
+    f('Habilidades Identificadas', ta('paee_hab','Competências e potencialidades que servirão de base para o trabalho no AEE...','md')),
+    f('Barreiras de Aprendizagem', ta('paee_barr','Principais obstáculos identificados para a plena participação e aprendizagem do aluno...','md'))
+  ) +
+  sec('Objetivos e Metas do AEE','07', 1,
+    f('Objetivo Geral do Plano', ta('paee_obj','O que se espera alcançar com o aluno ao longo do período de atendimento...','md')),
+    f('Metas Específicas', ta('paee_metas','Liste as metas específicas por área de trabalho — comunicação, cognição, autonomia, motor...','xl')),
+    f('Atividades e Recursos Planejados', ta('paee_atv','Atividades, jogos, softwares, tecnologias assistivas e materiais que serão utilizados...','lg'))
+  ) +
+  sec('Articulação com a Sala Regular','08', 1,
+    f('Orientações ao Professor da Sala Regular', ta('paee_orient','Estratégias, adaptações e orientações específicas para o professor regente aplicar em sala...','lg')),
+    f('Adaptações Curriculares Sugeridas', ta('paee_adap','Sugestões de adaptação de conteúdo, avaliação, tempo e materiais para a sala regular...','md')),
+    f('Comunicação com a Família', ta('paee_fam','Como a família será informada e envolvida no processo do AEE...','md'))
+  ) +
+  sec('Avaliação do Plano','09', 2,
+    f('Data de Revisão do Plano', inp('paee_rev','Ex.: Julho/2025')),
+    f('Critérios de Avaliação', inp('paee_crit','Como será avaliado o alcance das metas do plano')),
+    f('Resultados Alcançados / Observações', ta('paee_res','Registro do progresso do aluno e observações relevantes ao longo do período...','lg'), 's2')
+  ) + sAssinaturas() + sImagens();
+}
+
+function formTEA(t) {
+  return sInstit() + sDocumento(t.name) + sProfessor() + sAluno(true) +
+  sec('Caracterização do Aluno com TEA','05', 2,
+    f('Nível de Suporte (DSM-5)', sel('tea_nivel',['Nível 1 – Requer suporte','Nível 2 – Requer suporte substancial','Nível 3 – Requer suporte muito substancial'])),
+    f('CID / Laudo Clínico', inp('tea_cid','Ex.: F84.0 – Autismo Infantil / CID-11: 6A02')),
+    f('Data do Diagnóstico', dt('tea_diag_data')),
+    f('Profissional que Diagnosticou', inp('tea_med','Nome e especialidade do profissional')),
+    f('Medicação em Uso', ta('tea_med_uso','Medicamentos, doses e horários. Escreva "Não usa" se não aplicável.'), 's2'),
+    f('Perfil Sensorial', ta('tea_sens','Hipersensibilidades e hipossensibilidades identificadas: sons, toque, luz, texturas, cheiros...','md'), 's2'),
+    f('Interesses Específicos e Preferências', ta('tea_int','Temas, objetos, atividades e situações de maior engajamento do aluno...','md'), 's2')
+  ) +
+  sec('Desenvolvimento e Habilidades','06', 1,
+    f('Comunicação e Linguagem', ta('tea_ling','Modalidade de comunicação utilizada (verbal, PECS, CAA, gestos). Nível de expressão e compreensão oral e escrita. Ecolalia se presente...','lg')),
+    f('Interação Social', ta('tea_soc','Como o aluno interage com adultos e colegas. Contato visual, reciprocidade, participação em grupos, vínculos afetivos...','md')),
+    f('Comportamentos Repetitivos / Estereotipias', ta('tea_estereot','Comportamentos repetitivos observados, contextos em que ocorrem e estratégias já utilizadas...','md')),
+    f('Habilidades Cognitivas e Acadêmicas', ta('tea_cog','Nível de leitura, escrita, matemática. Habilidades de memória, atenção, resolução de problemas...','md')),
+    f('Autonomia e Autocuidado', ta('tea_aut','Independência nas rotinas: alimentação, higiene, deslocamento, organização do material...','md')),
+    f('Comportamentos Desafiadores', ta('tea_comp','Comportamentos que dificultam a rotina escolar, gatilhos identificados e estratégias de manejo...','lg'))
+  ) +
+  sec('Estratégias e Suporte Pedagógico','07', 1,
+    f('Estruturação do Ambiente', ta('tea_amb','Adaptações físicas e organizacionais da sala de aula: rotina visual, organização do espaço, redução de estímulos...','md')),
+    f('Suportes Visuais Utilizados', ta('tea_vis','Agendas visuais, cartões de comunicação, rotinas ilustradas, PECS, CAA — descreva o que é usado...','md')),
+    f('Estratégias de Ensino', ta('tea_est','Abordagens específicas: ABA, TEACCH, Denver, Floortime ou outras metodologias aplicadas...','lg')),
+    f('Adaptações nas Avaliações', ta('tea_aval','Como as avaliações são adaptadas: tempo extra, ambiente separado, formato diferenciado, avaliação funcional...','md')),
+    f('Tecnologias Assistivas', ta('tea_tec','Softwares, aplicativos, tablets, comunicadores, recursos digitais utilizados no apoio ao aluno...','md'))
+  ) +
+  sec('Rede de Apoio e Acompanhamento','08', 1,
+    f('Profissionais Externos que Acompanham', ta('tea_prof','Psicólogo, fonoaudiólogo, terapeuta ocupacional, psiquiatra, ABA — nomes e frequência de atendimento...','md')),
+    f('Orientações à Família', ta('tea_fam','Estratégias para continuidade do trabalho em casa e orientações específicas para os responsáveis...','md')),
+    f('Metas Prioritárias do Período', ta('tea_metas','As 3 a 5 metas mais importantes para o aluno no período atual — específicas, mensuráveis e alcançáveis...','lg')),
+    f('Evolução Observada', ta('tea_evol','Progresso registrado desde o início do acompanhamento — comparação com período anterior...','lg')),
+    f('Encaminhamentos e Próximos Passos', ta('tea_prox','Encaminhamentos para serviços, próximas avaliações, revisão do plano e outros desdobramentos...','md'))
+  ) + sAssinaturas() + sImagens();
+}
+
+/* ════════════════════════════════════════════════
+   RENDER NAVEGAÇÃO
+════════════════════════════════════════════════ */
+function togglePrevia() {
+  const ws  = document.querySelector('.workspace');
+  const btn = document.getElementById('btnPrevia');
+  const on  = ws.classList.toggle('show-preview');
+  btn.classList.toggle('active', on);
+  const ico = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> ';
+  btn.innerHTML = ico + (on ? 'Ocultar Prévia' : 'Pré-visualizar');
+  if (on) renderPreview();
+}
+
+function renderNav() {
+  document.getElementById('tabRail').innerHTML = TABS.map((t,i)=>`
+    <div class="tab-item${i===curIdx?' on':''}" onclick="switchTab(${i})" title="${t.name}">
+      <span class="tab-code">${t.id}</span>
+      <span class="tab-name">${t.label.replace(/\n/g,'<br>')}</span>
+    </div>`).join('');
+}
+
+function switchTab(i) {
+  curIdx = i;
+  renderNav();
+  renderForm();
+  doLoad();
+  renderPreview();
+}
+
+/* ════════════════════════════════════════════════
+   RENDER FORMULÁRIO
+════════════════════════════════════════════════ */
+function renderForm() {
+  const t = TABS[curIdx];
+  document.getElementById('formHead').innerHTML = `
+    <div class="form-head-icon">${t.id}</div>
+    <div class="form-head-text">
+      <h2>${t.name}</h2>
+      <p>${t.desc}</p>
+    </div>`;
+  document.getElementById('formBody').innerHTML = buildForm(curIdx);
+  renderImgGrid();
+  bindFields();
+}
+
+function bindFields() {
+  const debouncedPreview = debounce(renderPreview, 300);
+  document.querySelectorAll('[data-f]').forEach(el => {
+    el.addEventListener('input', debouncedPreview);
+    el.addEventListener('change', debouncedPreview);
+  });
+  document.querySelectorAll('.dyn-table input').forEach(el => {
+    el.addEventListener('input', debouncedPreview);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   LOGO DA INSTITUIÇÃO
+════════════════════════════════════════════════ */
+function loadLogo(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    logoDataURL = e.target.result;
+    const img = document.getElementById('logoImg');
+    img.src = logoDataURL; img.style.display = 'block';
+    document.getElementById('logoTxt').style.display = 'none';
+    renderPreview();
+  };
+  r.readAsDataURL(f);
+}
+
+/* ════════════════════════════════════════════════
+   IMAGENS COMPLEMENTARES
+════════════════════════════════════════════════ */
+function onImgs(inp) {
+  Array.from(inp.files).forEach(file => {
+    const r = new FileReader();
+    r.onload = e => { attachedImgs.push(e.target.result); renderImgGrid(); renderPreview(); };
+    r.readAsDataURL(file);
+  });
+  inp.value = '';
+}
+function delImg(i) { attachedImgs.splice(i,1); renderImgGrid(); renderPreview(); }
+function renderImgGrid() {
+  const g = document.getElementById('imgGrid'); if (!g) return;
+  g.innerHTML = attachedImgs.map((s,i) => `
+    <div class="img-thumb">
+      <img src="${s}" alt="">
+      <button class="img-thumb-del" onclick="delImg(${i})">×</button>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════════════
+   COLETA DE DADOS
+════════════════════════════════════════════════ */
+function getData() {
+  const d = {};
+  document.querySelectorAll('[data-f]').forEach(el => { d[el.dataset.f] = el.value || ''; });
+  return d;
+}
+
+/* ════════════════════════════════════════════════
+   PRÉ-VISUALIZAÇÃO A4
+════════════════════════════════════════════════ */
+function renderPreview() {
+  const d = getData(), t = TABS[curIdx];
+
+  /* Helpers do preview */
+  function row(...pairs) {
+    return `<div class="d-row">${pairs.map(([l,v]) =>
+      `<div class="d-cell"><span class="d-lbl">${l}</span><span class="d-val">${esc(v)||'&nbsp;'}</span></div>`
+    ).join('')}</div>`;
+  }
+  function blk(label, val) {
+    if (!val) return '';
+    return `<div>${label?`<span class="d-blk-lbl">${label}</span>`:''}<div class="d-blk">${esc(val).replace(/\n/g,'<br>')}</div></div>`;
+  }
+  function sec(title, ...items) {
+    const body = items.filter(Boolean).join('');
+    if (!body) return '';
+    return `<div class="d-sec"><div class="d-sec-t">${title}</div>${body}</div>`;
+  }
+
+  /* Blocos comuns */
+  const instSec = sec('Identificação Institucional',
+    row(['Instituição', gd(d,'i_nome')], ['Rede', gd(d,'i_rede')]),
+    row(['Município/UF', gd(d,'i_mun')], ['Telefone', gd(d,'i_tel')], ['E-mail', gd(d,'i_email')])
+  );
+  const docSec = sec('Documento',
+    row(['Período', gd(d,'d_periodo')], ['Ano Letivo', gd(d,'d_ano')], ['Emissão', fmtDate(gd(d,'d_emissao'))]),
+    row(['Etapa', gd(d,'d_etapa')], ['Série', gd(d,'d_serie')], ['Turma', gd(d,'d_turma')], ['Turno', gd(d,'d_turno')])
+  );
+  const profSec = gd(d,'p_nome') ? sec('Professor / Responsável',
+    row(['Nome', gd(d,'p_nome')], ['Disciplina', gd(d,'p_disc')]),
+    row(['Função', gd(d,'p_func')], ['Matrícula', gd(d,'p_mat')])
+  ) : '';
+  const alunoSec = gd(d,'a_nome') ? sec('Aluno',
+    row(['Nome', gd(d,'a_nome')], ['Matrícula', gd(d,'a_mat')]),
+    row(['Nasc.', fmtDate(gd(d,'a_nasc'))], ['Freq.', gd(d,'a_freq')+'%'], ['Situação', gd(d,'a_sit')])
+  ) : '';
+
+  /* Conteúdo específico */
+  const id = t.id; let sp = '';
+  if (id==='DC') sp = sec('Registro da Aula',
+    row(['Data', fmtDate(gd(d,'dc_data'))], ['Duração', gd(d,'dc_dur')], ['Presentes', gd(d,'dc_pres')], ['Ausentes', gd(d,'dc_aus')]),
+    blk('Conteúdo', gd(d,'dc_cont')), blk('Metodologia', gd(d,'dc_met')),
+    blk('Atividades', gd(d,'dc_atv')), blk('Observações', gd(d,'dc_obs'))
+  );
+  else if (id==='PA') sp =
+    sec('Aula', gd(d,'pa_tema') ? `<div style="font-size:9px;font-weight:bold;color:#0c1825;text-align:center;padding:3px 6px;border:1px solid #c5d8f5;border-radius:2px;margin-bottom:3px">${esc(gd(d,'pa_tema'))}</div>` : '',
+      row(['Data(s)', gd(d,'pa_datas')], ['Duração', gd(d,'pa_dur')])) +
+    sec('Objetivos', blk('Geral', gd(d,'pa_objg')), blk('Habilidades BNCC', gd(d,'pa_bncc'))) +
+    sec('Desenvolvimento', blk('Metodologia', gd(d,'pa_met')), blk('Avaliação', gd(d,'pa_aval')));
+  else if (id==='RO') sp = sec('Ocorrência',
+    row(['Data', fmtDate(gd(d,'ro_data'))], ['Hora', gd(d,'ro_hora')], ['Tipo', gd(d,'ro_tipo')], ['Grau', gd(d,'ro_grav')]),
+    row(['Local', gd(d,'ro_local')]),
+    blk('Envolvidos', gd(d,'ro_env')), blk('Descrição', gd(d,'ro_desc')),
+    blk('Providências', gd(d,'ro_prov')), blk('Encaminhamentos', gd(d,'ro_enc'))
+  );
+  else if (id==='RMD') sp = sec('Desempenho Mensal',
+    row(['Frequência', gd(d,'rm_freq')+'%'], ['Conceito', gd(d,'rm_conc')]),
+    blk('Pedagógico', gd(d,'rm_ped')), blk('Comportamento', gd(d,'rm_comp')),
+    blk('Dificuldades', gd(d,'rm_dif')), blk('Avanços', gd(d,'rm_av'))
+  );
+  else if (id==='RBA') sp =
+    sec('Componentes', blk('Português', gd(d,'rb_port')), blk('Matemática', gd(d,'rb_mat'))) +
+    sec('Parecer', blk('', gd(d,'rb_par')));
+  else if (id==='RS') sp = sec('Semestre',
+    row(['Frequência', gd(d,'rs_freq')+'%'], ['Conceito', gd(d,'rs_nota')]),
+    blk('Desempenho', gd(d,'rs_desemp')), blk('Cognitivo', gd(d,'rs_cog')), blk('Social', gd(d,'rs_soc'))
+  );
+  else if (id==='HE') sp = `<div class="d-sec"><div class="d-sec-t">Trajetória Escolar</div>
+    <table class="d-tbl"><thead><tr><th>Ano</th><th>Série</th><th>Escola</th><th>Resultado</th><th>Freq.</th></tr></thead>
+    <tbody><tr><td colspan="5" style="text-align:center;color:#9ca3af;font-style:italic;padding:3px">Preencha a tabela no formulário</td></tr></tbody></table></div>`;
+  else if (id==='PEI') sp = sec('PEI',
+    blk('Diagnóstico', gd(d,'pe_diag')), blk('Objetivos', gd(d,'pe_obj')), blk('Estratégias', gd(d,'pe_est'))
+  );
+  else if (id==='AEE') sp = sec('AEE',
+    row(['Tipo', gd(d,'ae_tipo')], ['Frequência', gd(d,'ae_freq')]),
+    blk('Objetivos', gd(d,'ae_obj')), blk('Evolução', gd(d,'ae_evol'))
+  );
+  else if (id==='RDI') sp = sec('Desenvolvimento',
+    blk('Cognitivo', gd(d,'rd_cog')), blk('Linguagem', gd(d,'rd_ling')),
+    blk('Social', gd(d,'rd_soc')), blk('Avanços', gd(d,'rd_av'))
+  );
+  else if (id==='PPP') sp =
+    sec('Identidade', blk('Missão', gd(d,'pp_miss')), blk('Visão', gd(d,'pp_vis'))) +
+    sec('Planejamento', blk('Metas', gd(d,'pp_metas')), blk('Ações', gd(d,'pp_acoes')));
+  else if (id==='PDE') sp =
+    sec('Diagnóstico', blk('', gd(d,'pd_diag'))) +
+    `<div class="d-sec"><div class="d-sec-t">Plano de Ação</div>
+    <table class="d-tbl"><thead><tr><th>Ação</th><th>Responsável</th><th>Prazo</th><th>Status</th></tr></thead>
+    <tbody><tr><td colspan="4" style="text-align:center;color:#9ca3af;font-style:italic;padding:3px">Preencha a tabela no formulário</td></tr></tbody></table></div>`;
+  else if (id==='PDI') sp =
+    sec('Perfil do Aluno', blk('Diagnóstico/CID', gd(d,'pdi_cid')), blk('Perfil', gd(d,'pdi_perfil')), blk('Habilidades', gd(d,'pdi_hab'))) +
+    sec('Metas', blk('Cognitivas', gd(d,'pdi_meta_cog')), blk('Comunicação', gd(d,'pdi_meta_ling')), blk('Socialização', gd(d,'pdi_meta_soc'))) +
+    sec('Estratégias', blk('Pedagógicas', gd(d,'pdi_est')), blk('Adaptações', gd(d,'pdi_adap')));
+  else if (id==='API') sp =
+    sec('Avaliação', row(['Data', fmtDate(gd(d,'api_data'))], ['Tipo', gd(d,'api_tipo')]),
+      blk('Avaliadores', gd(d,'api_aval'))) +
+    sec('Resultados', blk('Cognitivo/Acadêmico', gd(d,'api_cog')), blk('Linguagem', gd(d,'api_ling')), blk('Socioemocional', gd(d,'api_soc'))) +
+    sec('Recomendações', blk('Pedagógicas', gd(d,'api_rec_ped')), blk('À Família', gd(d,'api_rec_fam')));
+  else if (id==='PAEE') sp =
+    sec('AEE', row(['Frequência', gd(d,'paee_freq')], ['Modalidade', gd(d,'paee_mod')], ['Turno', gd(d,'paee_turno')]),
+      blk('Diagnóstico', gd(d,'paee_diag'))) +
+    sec('Objetivos', blk('Objetivo Geral', gd(d,'paee_obj')), blk('Metas', gd(d,'paee_metas'))) +
+    sec('Sala Regular', blk('Orientações ao Professor', gd(d,'paee_orient')));
+  else if (id==='TEA') sp =
+    sec('Caracterização', row(['Nível DSM-5', gd(d,'tea_nivel')], ['CID', gd(d,'tea_cid')]),
+      blk('Perfil Sensorial', gd(d,'tea_sens')), blk('Interesses', gd(d,'tea_int'))) +
+    sec('Desenvolvimento', blk('Comunicação', gd(d,'tea_ling')), blk('Interação Social', gd(d,'tea_soc')), blk('Comportamentos', gd(d,'tea_comp'))) +
+    sec('Estratégias', blk('Estruturação do Ambiente', gd(d,'tea_amb')), blk('Suportes Visuais', gd(d,'tea_vis')), blk('Metas', gd(d,'tea_metas')));
+
+  /* Assinaturas */
+  const sigH = (gd(d,'s_prof')||gd(d,'s_coord')||gd(d,'s_dir')) ? `
+    <div class="d-sigs">
+      <div class="d-sig"><div class="d-sig-line">${esc(gd(d,'s_prof'))}</div><span class="d-sig-lbl">Professor(a)</span></div>
+      <div class="d-sig"><div class="d-sig-line">${esc(gd(d,'s_coord'))}</div><span class="d-sig-lbl">Coordenação</span></div>
+      <div class="d-sig"><div class="d-sig-line">${esc(gd(d,'s_dir'))}</div><span class="d-sig-lbl">Direção</span></div>
+    </div>` : '';
+
+  /* Imagens */
+  const imgH = attachedImgs.length ? `<div class="d-sec"><div class="d-sec-t">Imagens</div>
+    <div style="display:flex;gap:3px;flex-wrap:wrap">${attachedImgs.map(s =>
+      `<img src="${s}" style="width:44px;height:34px;object-fit:cover;border-radius:1.5px;border:.5px solid #e5e7eb">`).join('')}
+    </div></div>` : '';
+
+  /* Monta A4 */
+  const logoH = logoDataURL
+    ? `<img class="d-logo" src="${logoDataURL}" alt="">`
+    : `<div class="d-logo-ph">LOGO<br>INST.</div>`;
+  const emissao = fmtDate(gd(d,'d_emissao')) || new Date().toLocaleDateString('pt-BR');
+
+  document.getElementById('a4Doc').innerHTML = `
+    <div class="d-head">
+      ${logoH}
+      <div class="d-inst">
+        <span class="d-inst-name">${esc(gd(d,'i_nome','Nome da Instituição de Ensino'))}</span>
+        <span class="d-inst-info">${[gd(d,'i_rede'), gd(d,'i_mun'), gd(d,'i_tel')].filter(Boolean).map(esc).join(' · ')}</span>
+      </div>
+      <div class="d-emissao">Emissão<br><strong>${emissao}</strong></div>
+    </div>
+    <div class="d-banner">
+      <span class="d-banner-code">${t.id}</span>
+      <span class="d-banner-name">${t.name.toUpperCase()}</span>
+    </div>
+    ${instSec}${docSec}${profSec}${alunoSec}${sp}${imgH}${sigH}
+    <div class="d-footer">
+      <span>Portal do Educador · NEWPC Tecnologia</span>
+      <span>${t.id} · ${t.name} · Emitido em ${emissao}</span>
+    </div>`;
+}
+
+/* ════════════════════════════════════════════════
+   DOCUMENTO PARA IMPRESSÃO / PDF
+════════════════════════════════════════════════ */
+function buildDocHTML() {
+  const d = getData(), t = TABS[curIdx];
+  const g = (k,fb='') => (d[k]||fb).toString().trim();
+  const fd = k => { const v=g(k); if(!v)return''; const p=v.split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:v; };
+
+  function row(...pp) {
+    return `<div class="row">${pp.map(([l,v]) =>
+      `<div class="cell"><span class="lbl">${l}</span><span class="val">${v||'—'}</span></div>`
+    ).join('')}</div>`;
+  }
+  function blk(l,v) {
+    if (!v) return '';
+    return `<div class="bwrap">${l?`<span class="blbl">${l}</span>`:''}<div class="blk">${v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div></div>`;
+  }
+  function sec(title,...items) {
+    const body=items.filter(Boolean).join(''); if(!body)return'';
+    return `<div class="sec"><div class="sec-t">${title}</div>${body}</div>`;
+  }
+
+  /* Seções comuns */
+  const iSec = sec('Identificação Institucional',
+    row(['Instituição',g('i_nome')],['Rede',g('i_rede')]),
+    row(['Município/UF',g('i_mun')],['Telefone',g('i_tel')],['E-mail',g('i_email')])
+  );
+  const dSec = sec('Documento',
+    row(['Período',g('d_periodo')],['Ano Letivo',g('d_ano')],['Emissão',fd('d_emissao')]),
+    row(['Etapa',g('d_etapa')],['Série',g('d_serie')],['Turma',g('d_turma')],['Turno',g('d_turno')])
+  );
+  const pSec = g('p_nome') ? sec('Professor / Responsável',
+    row(['Nome',g('p_nome')],['Disciplina',g('p_disc')]),
+    row(['Função',g('p_func')],['Matrícula',g('p_mat')],['Local/Data',g('p_ld')])
+  ) : '';
+  const aSec = g('a_nome') ? sec('Aluno',
+    row(['Nome Completo',g('a_nome')],['Matrícula',g('a_mat')]),
+    row(['Nascimento',fd('a_nasc')],['Frequência',g('a_freq')+'%'],['Situação',g('a_sit')]),
+    g('a_mae') ? row(['Mãe',g('a_mae')],['Pai/Responsável',g('a_pai')]) : '',
+    g('a_tel') ? row(['Telefone Responsável',g('a_tel')],['Sala',g('a_sala')]) : '',
+    g('a_nee') ? blk('Diagnóstico / NEE', g('a_nee')) : ''
+  ) : '';
+
+  /* Conteúdo específico */
+  const id = t.id; let sp = '';
+  if (id==='DC') sp=sec('Registro da Aula',
+    row(['Data',fd('dc_data')],['Duração',g('dc_dur')],['Presentes',g('dc_pres')],['Ausentes',g('dc_aus')]),
+    blk('Conteúdo Ministrado',g('dc_cont')),blk('Metodologia Aplicada',g('dc_met')),
+    blk('Atividades Realizadas',g('dc_atv')),blk('Observações do Dia',g('dc_obs'))
+  );
+  else if (id==='PA') sp=
+    sec('Aula', g('pa_tema')?`<div class="tema">${g('pa_tema')}</div>`:'',row(['Data(s)',g('pa_datas')],['Duração',g('pa_dur')]))+
+    sec('Objetivos',blk('Objetivo Geral',g('pa_objg')),blk('Objetivos Específicos',g('pa_obje')),blk('Habilidades BNCC',g('pa_bncc')))+
+    sec('Desenvolvimento',blk('Conteúdos',g('pa_cont')),blk('Metodologia',g('pa_met')),blk('Recursos',g('pa_rec')),blk('Avaliação',g('pa_aval')),blk('Adaptações',g('pa_adap')));
+  else if (id==='RO') sp=sec('Ocorrência',
+    row(['Data',fd('ro_data')],['Horário',g('ro_hora')],['Tipo',g('ro_tipo')],['Gravidade',g('ro_grav')]),
+    row(['Local',g('ro_local')]),
+    blk('Envolvidos',g('ro_env')),blk('Descrição Detalhada',g('ro_desc')),
+    blk('Providências Imediatas',g('ro_prov')),blk('Encaminhamentos',g('ro_enc')),blk('Notificados',g('ro_notif'))
+  );
+  else if (id==='RMD') sp=sec('Desempenho Mensal',
+    row(['Frequência',g('rm_freq')+'%'],['Conceito',g('rm_conc')]),
+    blk('Desempenho Pedagógico',g('rm_ped')),blk('Comportamento e Socialização',g('rm_comp')),
+    blk('Dificuldades',g('rm_dif')),blk('Avanços',g('rm_av')),blk('Recomendações à Família',g('rm_rec'))
+  );
+  else if (id==='RBA') sp=
+    sec('Desempenho por Componente',
+      blk('Língua Portuguesa',g('rb_port')),blk('Matemática',g('rb_mat')),blk('Ciências',g('rb_cien')),
+      blk('Ciências Humanas',g('rb_hum')),blk('Arte / Ed. Física / E. Religioso',g('rb_out')),
+      blk('Habilidades BNCC Consolidadas',g('rb_hab')),blk('Dificuldades',g('rb_dif')))+
+    sec('Parecer Descritivo',blk('',g('rb_par')));
+  else if (id==='RS') sp=sec('Relatório Semestral',
+    row(['Frequência',g('rs_freq')+'%'],['Conceito/Nota',g('rs_nota')]),
+    blk('Desempenho Geral',g('rs_desemp')),blk('Aspectos Cognitivos',g('rs_cog')),
+    blk('Socialização',g('rs_soc')),blk('Avanços',g('rs_av')),
+    blk('Desafios',g('rs_desaf')),blk('Recomendações',g('rs_rec'))
+  );
+  else if (id==='HE') sp = blk('Observações do Histórico',g('he_obs'));
+  else if (id==='PEI') sp=sec('Plano Educacional Individualizado',
+    blk('Diagnóstico/Condição',g('pe_diag')),blk('Necessidades Específicas',g('pe_nee')),
+    blk('Objetivos Personalizados',g('pe_obj')),blk('Estratégias',g('pe_est')),
+    blk('Adaptações Curriculares',g('pe_adap')),blk('Acessibilidade',g('pe_aces')),
+    blk('Acompanhamento',g('pe_acomp')),blk('Equipe',g('pe_equipe'))
+  );
+  else if (id==='AEE') sp=sec('Atendimento Educacional Especializado',
+    row(['Tipo',g('ae_tipo')],['Frequência',g('ae_freq')]),
+    blk('Objetivos',g('ae_obj')),blk('Recursos',g('ae_rec')),
+    blk('Evolução',g('ae_evol')),blk('Intervenções',g('ae_int')),blk('Encaminhamentos',g('ae_enc'))
+  );
+  else if (id==='RDI') sp=sec('Desenvolvimento Individual',
+    blk('Aspectos Cognitivos',g('rd_cog')),blk('Motor',g('rd_mot')),blk('Linguagem',g('rd_ling')),
+    blk('Social',g('rd_soc')),blk('Autonomia',g('rd_aut')),blk('Avanços',g('rd_av')),
+    blk('Dificuldades',g('rd_dif')),blk('Recomendações',g('rd_rec'))
+  );
+  else if (id==='PPP') sp=
+    sec('Identidade',blk('Missão',g('pp_miss')),blk('Visão',g('pp_vis')),blk('Valores',g('pp_val')))+
+    sec('Diagnóstico e Planejamento',blk('Diagnóstico',g('pp_diag')),blk('Objetivos',g('pp_obj')),
+      blk('Metas',g('pp_metas')),blk('Ações',g('pp_acoes')),blk('Estratégias',g('pp_est')),
+      blk('Cronograma',g('pp_cron')),blk('Avaliação',g('pp_aval')));
+  else if (id==='PDE') sp=
+    sec('Diagnóstico',blk('',g('pd_diag')),blk('Metas',g('pd_metas')))+
+    sec('Monitoramento',blk('Acompanhamento',g('pd_acomp')),blk('Observações',g('pd_obs')));
+  else if (id==='PDI') sp=
+    sec('Perfil do Aluno',blk('Diagnóstico/CID',g('pdi_cid')),blk('Perfil',g('pdi_perfil')),blk('Habilidades Desenvolvidas',g('pdi_hab')),blk('Necessidades Prioritárias',g('pdi_nec')))+
+    sec('Metas de Desenvolvimento',blk('Metas Cognitivas',g('pdi_meta_cog')),blk('Comunicação e Linguagem',g('pdi_meta_ling')),blk('Metas Motoras',g('pdi_meta_mot')),blk('Socialização',g('pdi_meta_soc')),blk('Autonomia',g('pdi_meta_aut')))+
+    sec('Estratégias e Intervenções',blk('Estratégias Pedagógicas',g('pdi_est')),blk('Adaptações Curriculares',g('pdi_adap')),blk('Tecnologias Assistivas',g('pdi_rec')),blk('Profissionais Envolvidos',g('pdi_prof')))+
+    sec('Avaliação',row(['Vigência',g('pdi_vigencia')],['Revisão',g('pdi_revisao')]),blk('Critérios',g('pdi_crit')),blk('Observações',g('pdi_obs')));
+  else if (id==='API') sp=
+    sec('Dados da Avaliação',row(['Data',fd('api_data')],['Tipo',g('api_tipo')]),blk('Avaliadores',g('api_aval')),blk('Instrumentos Utilizados',g('api_inst')))+
+    sec('Resultados por Área',blk('Cognitivo e Acadêmico',g('api_cog')),blk('Linguagem e Comunicação',g('api_ling')),blk('Desenvolvimento Motor',g('api_mot')),blk('Socioemocional',g('api_soc')),blk('Autonomia',g('api_aut')),blk('Comportamento',g('api_comp')))+
+    sec('Conclusão e Recomendações',blk('Síntese dos Resultados',g('api_sint')),blk('Recomendações Pedagógicas',g('api_rec_ped')),blk('Recomendações à Família',g('api_rec_fam')),blk('Encaminhamentos',g('api_enc')),blk('Próximos Passos',g('api_prox')));
+  else if (id==='PAEE') sp=
+    sec('Dados do Atendimento',row(['Frequência',g('paee_freq')],['Modalidade',g('paee_mod')],['Turno',g('paee_turno')]),row(['Tipo de Sala',g('paee_tipo')],['Vigência',g('paee_vig')]),blk('Diagnóstico e Justificativa',g('paee_diag')),blk('Habilidades',g('paee_hab')),blk('Barreiras',g('paee_barr')))+
+    sec('Objetivos e Metas',blk('Objetivo Geral',g('paee_obj')),blk('Metas Específicas',g('paee_metas')),blk('Atividades e Recursos',g('paee_atv')))+
+    sec('Articulação com Sala Regular',blk('Orientações ao Professor',g('paee_orient')),blk('Adaptações Curriculares',g('paee_adap')),blk('Comunicação com a Família',g('paee_fam')))+
+    sec('Avaliação do Plano',row(['Revisão',g('paee_rev')],['Critérios',g('paee_crit')]),blk('Resultados Alcançados',g('paee_res')));
+  else if (id==='TEA') sp=
+    sec('Caracterização do Aluno com TEA',row(['Nível de Suporte (DSM-5)',g('tea_nivel')],['CID',g('tea_cid')]),row(['Data do Diagnóstico',fd('tea_diag_data')],['Diagnosticado por',g('tea_med')]),blk('Medicação em Uso',g('tea_med_uso')),blk('Perfil Sensorial',g('tea_sens')),blk('Interesses e Preferências',g('tea_int')))+
+    sec('Desenvolvimento e Habilidades',blk('Comunicação e Linguagem',g('tea_ling')),blk('Interação Social',g('tea_soc')),blk('Comportamentos Repetitivos',g('tea_estereot')),blk('Habilidades Cognitivas',g('tea_cog')),blk('Autonomia',g('tea_aut')),blk('Comportamentos Desafiadores',g('tea_comp')))+
+    sec('Estratégias e Suporte',blk('Estruturação do Ambiente',g('tea_amb')),blk('Suportes Visuais',g('tea_vis')),blk('Estratégias de Ensino',g('tea_est')),blk('Adaptações nas Avaliações',g('tea_aval')),blk('Tecnologias Assistivas',g('tea_tec')))+
+    sec('Rede de Apoio',blk('Profissionais Externos',g('tea_prof')),blk('Orientações à Família',g('tea_fam')),blk('Metas Prioritárias',g('tea_metas')),blk('Evolução Observada',g('tea_evol')),blk('Próximos Passos',g('tea_prox')));
+
+  /* Imagens */
+  const imgH = attachedImgs.length ? `<div class="sec"><div class="sec-t">Imagens Complementares</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8pt">
+      ${attachedImgs.map(s=>`<img src="${s}" style="width:90pt;height:68pt;object-fit:cover;border-radius:3pt;border:.5pt solid #e5e7eb">`).join('')}
+    </div></div>` : '';
+
+  /* Assinaturas */
+  const sigH = (g('s_prof')||g('s_coord')||g('s_dir')) ? `
+    <div class="sigs">
+      <div class="sig"><div class="sig-l">${g('s_prof')}</div><div class="sig-n">Professor(a)</div></div>
+      <div class="sig"><div class="sig-l">${g('s_coord')}</div><div class="sig-n">Coordenação Pedagógica</div></div>
+      <div class="sig"><div class="sig-l">${g('s_dir')}</div><div class="sig-n">Direção</div></div>
+    </div>` : '';
+  const carH = g('s_carimbo') ? `<div class="carimbo">${g('s_carimbo')}</div>` : '';
+  const logoH = logoDataURL ? `<img class="logo" src="${logoDataURL}" alt="">` : `<div class="logo-ph">LOGO<br>INST.</div>`;
+  const emissao = fd('d_emissao') || new Date().toLocaleDateString('pt-BR');
+
+  const css = `
+@page { size: A4; margin: 17mm 20mm 20mm; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 9.5pt; line-height: 1.65; color: #111;
+  background: #fff;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+/* CABEÇALHO DO DOCUMENTO */
+.doc-head {
+  display: flex; align-items: flex-start; gap: 12pt;
+  padding-bottom: 10pt;
+  border-bottom: 3pt solid #1a3f7a;
+  margin-bottom: 10pt;
+}
+.logo { width: 56pt; height: 56pt; object-fit: contain; flex-shrink: 0; }
+.logo-ph {
+  width: 56pt; height: 56pt; flex-shrink: 0;
+  background: #e8f2ff; border-radius: 3pt;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7pt; color: #1a3f7a; text-align: center;
+  border: 1pt solid #c5d8f5; line-height: 1.3;
+}
+.doc-inst { flex: 1; }
+.inst-name { font-size: 14pt; font-weight: bold; color: #0c1825; display: block; margin-bottom: 3pt; line-height: 1.2; }
+.inst-info { font-size: 8pt; color: #4b5563; display: block; }
+.doc-emissao { font-size: 8pt; color: #6b7280; text-align: right; flex-shrink: 0; line-height: 1.6; }
+/* BANNER TIPO DOCUMENTO */
+.doc-banner {
+  background: #1a3f7a; color: #fff;
+  text-align: center; padding: 7pt 10pt;
+  border-radius: 3pt; margin-bottom: 12pt;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.doc-banner .code { font-size: 8pt; opacity: .8; display: block; font-family: monospace; letter-spacing: 1pt; margin-bottom: 1pt; }
+.doc-banner .name { font-size: 15pt; font-weight: bold; display: block; letter-spacing: .5pt; }
+/* SEÇÕES */
+.sec { margin-bottom: 11pt; page-break-inside: avoid; }
+.sec-t {
+  font-size: 8pt; font-weight: bold; color: #1a3f7a;
+  text-transform: uppercase; letter-spacing: .8pt;
+  border-bottom: 1pt solid #c5d8f5; padding-bottom: 3pt;
+  margin-bottom: 7pt; font-family: monospace;
+}
+/* CAMPOS */
+.row { display: flex; gap: 10pt; margin-bottom: 5pt; }
+.cell { flex: 1; min-width: 0; }
+.lbl { display: block; font-size: 7pt; font-weight: bold; color: #6b7280; text-transform: uppercase; letter-spacing: .3pt; margin-bottom: 1pt; }
+.val { display: block; font-size: 9pt; color: #111; border-bottom: .5pt solid #d1d5db; min-height: 13pt; padding-bottom: 1.5pt; }
+/* BLOCOS TEXTO */
+.bwrap { margin-bottom: 8pt; }
+.blbl { font-size: 8pt; font-weight: bold; color: #374151; display: block; margin-bottom: 3pt; text-transform: uppercase; letter-spacing: .3pt; }
+.blk {
+  font-size: 9pt; line-height: 1.7; color: #1f2937;
+  border: .5pt solid #e5e7eb; padding: 5.5pt 8pt;
+  border-radius: 2pt; background: #fafbfd;
+  white-space: pre-wrap;
+}
+/* TEMA DESTAQUE */
+.tema {
+  font-size: 13pt; font-weight: bold; color: #0c1825;
+  text-align: center; padding: 8pt;
+  border: 1pt solid #c5d8f5; border-radius: 3pt; margin-bottom: 10pt;
+}
+/* ASSINATURAS */
+.sigs { display: flex; gap: 24pt; margin-top: 32pt; }
+.sig { flex: 1; text-align: center; }
+.sig-l { font-size: 9pt; color: #374151; border-bottom: .5pt solid #374151; min-height: 18pt; padding-bottom: 3pt; margin-bottom: 4pt; }
+.sig-n { font-size: 8pt; color: #6b7280; }
+/* CARIMBO */
+.carimbo { font-size: 8pt; color: #9ca3af; border: .5pt dashed #d1d5db; padding: 4pt 8pt; border-radius: 2pt; margin-top: 8pt; text-align: right; }
+/* RODAPÉ */
+.doc-footer { margin-top: 18pt; display: flex; justify-content: space-between; font-size: 7pt; color: #cbd5e1; border-top: .5pt solid #f1f5f9; padding-top: 4pt; }
+/* TABELA */
+.dyn-tbl { width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 6pt; }
+.dyn-tbl th { background: #1a3f7a; color: #fff; padding: 5pt 8pt; text-align: left; font-weight: 600; font-size: 8pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.dyn-tbl td { border: .5pt solid #e5e7eb; padding: 4pt 8pt; }
+.dyn-tbl tr:nth-child(even) td { background: #f1f5fb; }`;
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>${t.id} – ${t.name}</title>
+<style>${css}
+/* ═══════════════════════════════════════════════════════
+   ACESSIBILIDADE
+═══════════════════════════════════════════════════════ */
+
+/* Painel flutuante */
+.a11y-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:20px;
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.85);
+  font-family:var(--f-body);font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;letter-spacing:.2px;
+  white-space:nowrap;
+}
+.a11y-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35)}
+.a11y-btn svg{flex-shrink:0}
+
+.a11y-panel{
+  position:fixed;top:66px;right:28px;
+  width:300px;
+  background:var(--canvas);
+  border:1.5px solid var(--border);
+  border-radius:var(--r16);
+  box-shadow:var(--sh-xl);
+  z-index:500;
+  overflow:hidden;
+  display:none;
+  animation:slideDown .2s ease;
+}
+.a11y-panel.open{display:block}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+.a11y-head{
+  padding:16px 20px 14px;
+  background:linear-gradient(135deg,var(--ink-2),var(--cobalt));
+  display:flex;align-items:center;gap:10px;
+}
+.a11y-head-icon{
+  width:36px;height:36px;border-radius:var(--r8);
+  background:rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.a11y-head h3{
+  font-family:var(--f-display);font-size:15px;color:#fff;flex:1;
+}
+.a11y-head p{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.a11y-close{
+  background:rgba(255,255,255,.1);border:none;
+  color:rgba(255,255,255,.7);width:26px;height:26px;
+  border-radius:50%;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .14s;flex-shrink:0;
+}
+.a11y-close:hover{background:rgba(255,255,255,.25);color:#fff}
+
+.a11y-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:16px}
+
+.a11y-group{}
+.a11y-group-label{
+  font-size:9.5px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--cobalt-mid);
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.a11y-group-label::after{content:'';flex:1;height:1px;background:var(--border-lt)}
+
+/* Controle de fonte */
+.font-control{
+  display:flex;align-items:center;gap:0;
+  background:var(--slate);border:1.5px solid var(--border);
+  border-radius:var(--r8);overflow:hidden;
+}
+.font-btn{
+  width:40px;height:40px;border:none;background:transparent;
+  cursor:pointer;font-size:16px;font-weight:700;color:var(--t2);
+  transition:background .14s;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.font-btn:hover{background:var(--sky-deep);color:var(--cobalt)}
+.font-display{
+  flex:1;text-align:center;
+  font-size:13px;font-weight:700;color:var(--text);
+  font-family:var(--f-mono);letter-spacing:.5px;
+}
+.font-presets{display:flex;gap:6px;margin-top:8px}
+.font-preset{
+  flex:1;padding:7px 4px;
+  background:var(--slate);border:1.5px solid var(--border);
+  border-radius:var(--r5);cursor:pointer;
+  text-align:center;font-family:var(--f-body);
+  font-weight:600;color:var(--t2);
+  transition:all .14s;
+}
+.font-preset:hover{border-color:var(--cobalt-mid);color:var(--cobalt);background:var(--sky)}
+.font-preset.active{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.font-preset span{display:block;font-size:11px;font-weight:400;color:inherit;opacity:.7;margin-top:1px}
+
+/* Toggles */
+.a11y-toggles{display:flex;flex-direction:column;gap:8px}
+.a11y-toggle{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;
+  background:var(--slate);border:1.5px solid var(--border);
+  border-radius:var(--r8);cursor:pointer;
+  transition:border-color .14s,background .14s;
+}
+.a11y-toggle:hover{border-color:var(--border)}
+.a11y-toggle-icon{
+  width:32px;height:32px;border-radius:var(--r5);
+  background:var(--sky);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:16px;
+}
+.a11y-toggle-text{flex:1}
+.a11y-toggle-text strong{font-size:12.5px;font-weight:600;color:var(--text);display:block;line-height:1.3}
+.a11y-toggle-text span{font-size:11px;color:var(--t3)}
+.a11y-switch{
+  width:38px;height:22px;border-radius:11px;
+  background:var(--t5);position:relative;
+  transition:background .2s;flex-shrink:0;
+}
+.a11y-switch::after{
+  content:'';position:absolute;
+  top:3px;left:3px;
+  width:16px;height:16px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);
+  transition:transform .2s;
+}
+.a11y-toggle.on .a11y-switch{background:var(--cobalt-mid)}
+.a11y-toggle.on .a11y-switch::after{transform:translateX(16px)}
+
+/* Barra de progresso da fonte */
+.font-bar{
+  height:4px;background:var(--border-lt);border-radius:2px;
+  margin-top:8px;overflow:hidden;
+}
+.font-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--cobalt),var(--cobalt-lt));
+  border-radius:2px;transition:width .2s;
+}
+
+/* Reset btn */
+.a11y-reset{
+  width:100%;padding:9px;
+  background:transparent;border:1.5px solid var(--border);
+  border-radius:var(--r8);color:var(--t3);
+  font-family:var(--f-body);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .14s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.a11y-reset:hover{background:var(--red-bg);color:var(--red);border-color:rgba(153,27,27,.25)}
+
+/* ── MODOS DE ACESSIBILIDADE ── */
+
+/* Alto Contraste */
+body.a11y-contrast{
+  --bg:#000;--canvas:#0a0a0a;--surface2:#111;
+  --border:#444;--border-lt:#333;--slate:#111;
+  --text:#fff;--t2:#f0f0f0;--t3:#ccc;--t4:#999;--t5:#666;
+  --sky:#001a33;--sky-deep:#002244;
+  --cobalt:#4d9fff;--cobalt-mid:#5ba8ff;--cobalt-lt:#7bbfff;
+  --blue-pale:#001122;
+}
+body.a11y-contrast input,
+body.a11y-contrast select,
+body.a11y-contrast textarea{
+  background:#111;color:#fff;border-color:#555;
+}
+body.a11y-contrast input::placeholder,
+body.a11y-contrast textarea::placeholder{color:#666}
+
+/* Espaçamento ampliado */
+body.a11y-spacing label{font-size:13px;margin-bottom:3px}
+body.a11y-spacing input,
+body.a11y-spacing select,
+body.a11y-spacing textarea{padding:13px 14px;font-size:15px}
+body.a11y-spacing .fsec{margin-bottom:36px}
+body.a11y-spacing .fg{gap:18px}
+body.a11y-spacing .form-body>*:first-child{margin-top:30px}
+
+/* Sublinha nos campos */
+body.a11y-underline input,
+body.a11y-underline select,
+body.a11y-underline textarea{
+  border-radius:0;
+  border-top:none;border-left:none;border-right:none;
+  border-bottom:2.5px solid var(--cobalt-mid);
+  background:transparent;padding-left:2px;
+}
+body.a11y-underline input:focus,
+body.a11y-underline select:focus,
+body.a11y-underline textarea:focus{
+  box-shadow:none;
+  border-bottom-color:var(--cobalt-lt);
+  background:var(--sky);
+}
+
+</style>
+</head>
+<body>
+  <div class="doc-head">
+    ${logoH}
+    <div class="doc-inst">
+      <span class="inst-name">${g('i_nome','Nome da Instituição de Ensino')}</span>
+      <span class="inst-info">${[g('i_rede'),g('i_mun'),g('i_tel'),g('i_email')].filter(Boolean).join(' · ')}</span>
+    </div>
+    <div class="doc-emissao">Emissão<br><strong>${emissao}</strong></div>
+  </div>
+  <div class="doc-banner">
+    <span class="code">${t.id}</span>
+    <span class="name">${t.name.toUpperCase()}</span>
+  </div>
+  ${iSec}${dSec}${pSec}${aSec}${sp}${imgH}${sigH}${carH}
+  <div class="doc-footer">
+    <span>Portal do Educador · NEWPC Tecnologia</span>
+    <span>${t.id} – ${t.name} · Emitido em ${emissao}</span>
+  </div>
+<script>
+  window.addEventListener('load', function() {
+    var imgs = document.images, n = imgs.length, done = 0;
+    function go() { if (++done >= n || n === 0) setTimeout(function(){ window.print(); }, 380); }
+    if (n === 0) { setTimeout(function(){ window.print(); }, 380); return; }
+    for (var i = 0; i < n; i++) {
+      if (imgs[i].complete) go(); else { imgs[i].onload = go; imgs[i].onerror = go; }
+    }
+  });
+<\/script>
+</body>
+</html>`;
+}
+
+/* ════════════════════════════════════════════════
+   AÇÕES
+════════════════════════════════════════════════ */
+function openDocWindow() {
+  const html = buildDocHTML();
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if (!w || w.closed) {
+    const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  } else { w.focus(); }
+  setTimeout(() => URL.revokeObjectURL(url), 90000);
+}
+function doExport() {
+  openDocWindow();
+  showToast('Documento aberto · selecione "Salvar como PDF" no destino da impressão', 'info', '📄');
+}
+function doPrint() {
+  openDocWindow();
+  showToast('Documento aberto para impressão', 'info', '🖨️');
+}
+
+/* ════════════════════════════════════════════════
+   PERSISTÊNCIA
+════════════════════════════════════════════════ */
+function doSave() {
+  const key = `cr3_${TABS[curIdx].id}`;
+  const data = getData();
+  data.__logo = logoDataURL;
+  data.__imgs = attachedImgs;
+  try { localStorage.setItem(key, JSON.stringify(data)); showToast('Dados salvos com sucesso', 'ok', '✓'); }
+  catch(e) { showToast('Erro ao salvar. Armazenamento cheio?', 'err', '!'); }
+}
+function doLoad() {
+  const key = `cr3_${TABS[curIdx].id}`;
+  const raw = localStorage.getItem(key); if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    Object.entries(data).forEach(([k,v]) => {
+      if (k.startsWith('__')) return;
+      const el = document.querySelector(`[data-f="${k}"]`);
+      if (el) el.value = v;
+    });
+    if (data.__logo) {
+      logoDataURL = data.__logo;
+      const img = document.getElementById('logoImg');
+      if (img) { img.src = logoDataURL; img.style.display = 'block'; }
+      const txt = document.getElementById('logoTxt');
+      if (txt) txt.style.display = 'none';
+    }
+    if (data.__imgs) { attachedImgs = data.__imgs; renderImgGrid(); }
+    renderPreview();
+  } catch(e) {}
+}
+function doClear() {
+  if (!confirm('Limpar todos os campos do formulário atual?')) return;
+  document.querySelectorAll('[data-f]').forEach(el => { el.value = ''; });
+  attachedImgs = []; renderImgGrid(); renderPreview();
+  showToast('Formulário limpo', 'info', '🗑️');
+}
+
+/* ════════════════════════════════════════════════
+   TABELAS DINÂMICAS
+════════════════════════════════════════════════ */
+function addDynRow(tbodyId, cols) {
+  const tb = document.getElementById(tbodyId); if (!tb) return;
+  const tr = document.createElement('tr');
+  for (let i = 0; i < cols; i++) {
+    const td = document.createElement('td');
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.addEventListener('input', debounce(renderPreview, 300));
+    td.appendChild(inp); tr.appendChild(td);
+  }
+  tb.appendChild(tr);
+}
+
+/* ════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════ */
+renderNav();
+renderForm();
+doLoad();
+renderPreview();
+
+/* Auto-save a cada 60s */
+setInterval(() => {
+  if (document.querySelectorAll('[data-f]').length > 0) {
+    doSave();
+    document.getElementById('saveStatus').textContent = 'Salvo · ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+}, 60000);
+
+/* ════════════════════════════════════════════════
+   ACESSIBILIDADE
+════════════════════════════════════════════════ */
+const A11Y_KEY = 'cr3_a11y';
+let a11yState = { font: 100, contrast: false, spacing: false, underline: false };
+
+function loadA11y() {
+  try {
+    const saved = localStorage.getItem(A11Y_KEY);
+    if (saved) a11yState = { ...a11yState, ...JSON.parse(saved) };
+  } catch(e) {}
+  applyA11y();
+}
+
+function saveA11y() {
+  try { localStorage.setItem(A11Y_KEY, JSON.stringify(a11yState)); } catch(e) {}
+}
+
+function applyA11y() {
+  // Remove classes de escala anteriores
+  [100,108,115,130,150].forEach(n => document.body.classList.remove('fz-'+n));
+  // Aplica classe da escala atual
+  document.body.classList.add('fz-' + a11yState.font);
+
+  document.getElementById('fontDisplay').textContent = a11yState.font + '%';
+  // Barra de progresso
+  const steps2 = [100,108,115,130,150];
+  const si = steps2.indexOf(a11yState.font);
+  const pct = si < 0 ? 0 : Math.round(si / (steps2.length - 1) * 100);
+  document.getElementById('fontBarFill').style.width = pct + '%';
+  // Presets — marcar ativo
+  document.querySelectorAll('.font-preset').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.pct) === a11yState.font);
+  });
+  // Modos visuais
+  document.body.classList.toggle('a11y-contrast',  a11yState.contrast);
+  document.body.classList.toggle('a11y-spacing',   a11yState.spacing);
+  document.body.classList.toggle('a11y-underline', a11yState.underline);
+  // Toggles
+  ['contrast','spacing','underline'].forEach(k => {
+    const el = document.getElementById('tog-' + k);
+    if (el) el.classList.toggle('on', a11yState[k]);
+  });
+}
+
+function toggleA11y() {
+  const panel = document.getElementById('a11yPanel');
+  panel.classList.toggle('open');
+}
+
+// Fechar ao clicar fora
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('a11yPanel');
+  const btn   = document.getElementById('a11yBtn');
+  if (panel && panel.classList.contains('open')) {
+    if (!panel.contains(e.target) && !btn.contains(e.target)) {
+      panel.classList.remove('open');
+    }
+  }
+});
+
+function changeFont(dir) {
+  const steps = [100, 108, 115, 130, 150];
+  const cur = steps.indexOf(a11yState.font);
+  const next = cur === -1 ? 2 : Math.max(0, Math.min(steps.length - 1, cur + dir));
+  a11yState.font = steps[next];
+  applyA11y(); saveA11y();
+}
+
+function setFontPreset(btn, pct) {
+  a11yState.font = pct;
+  applyA11y(); saveA11y();
+}
+
+function toggleMode(mode, togId) {
+  a11yState[mode] = !a11yState[mode];
+  applyA11y(); saveA11y();
+}
+
+function resetA11y() {
+  a11yState = { font: 100, contrast: false, spacing: false, underline: false };
+  applyA11y(); saveA11y();
+  showToast('Configurações de acessibilidade restauradas', 'info', '♿');
+}
+
+// Inicializar acessibilidade
+loadA11y();
+
+</script>
+</body>
+</html>
